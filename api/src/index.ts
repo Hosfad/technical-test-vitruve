@@ -5,10 +5,9 @@ dotenv.config();
 
 
 const app = express();
-export let MAINTANCE_MODE = false;
-export function setMaintanceMode(mode: boolean){
-    MAINTANCE_MODE = mode;
-}
+
+
+
 app.use(
     cors({
         origin: "*",
