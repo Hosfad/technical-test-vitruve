@@ -10,9 +10,8 @@ export type Pokemon = {
     };
 
     stats : PokemonStats[];
-    types : {
-        type : PokemonData;
-    }[]
+    types : string[]
+    evolutions : PokemonData[]
 
 };
 

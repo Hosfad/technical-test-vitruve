@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prepare": "panda codegen",
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test.e2e": "cypress run",
@@ -26,6 +26,7 @@
     "@ionic/react-router": "^8.0.0",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
+    "framer-motion": "^11.3.24",
     "ionicons": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

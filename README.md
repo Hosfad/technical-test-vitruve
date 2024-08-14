@@ -4,8 +4,10 @@
 
 ## Install dependencies
 
+- While inside the main dir (technical-test-vitruve) run `npm install` it will install the dependencies for both ui and api.
+
 ```bash 
-(cd api && npm i) && (cd ui && npm i)
+npm install
 ```
 
 ## Run both client and server concurrently 
