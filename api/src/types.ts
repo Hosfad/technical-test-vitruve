@@ -1,3 +1,4 @@
+
 export type Pokemon = {
     name: string;
 
@@ -26,3 +27,5 @@ export type PokemonStats = {
     stat: PokemonData;
 
 }
+
+
