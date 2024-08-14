@@ -29,3 +29,11 @@ export type PokemonStats = {
 }
 
 
+export type User = {
+    name: string;
+    email: string;
+    password: string;
+    favorites: string[]
+    accessToken?: string
+}
+

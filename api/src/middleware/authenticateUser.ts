@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { getUserInfo } from "../utils";
 
 
 
@@ -13,22 +14,18 @@ export default function authenticateUser(req:Request, res:Response, next:NextFun
     }
     try {
 
-
         // we are gonna assume that the token is valid for the sake of this test 
+
         const tokenValid = true;
         if (!tokenValid) {
             return res.status(401).json({ error: "Invalid token" });
         }
 
-
-        // We pass the user object the request object so that it can be used in the route handler
-
-        //@ts-ignore
-        req.user = {
-            id: 1,
-            name: "testuser",
-            email: "test@vitruve.fit"
+        const user = getUserInfo(token);
+        if (!user) {
+            return res.status(401).json({ error: "Invalid token" });
         }
+        (req as any).user = user;
 
         next();
   

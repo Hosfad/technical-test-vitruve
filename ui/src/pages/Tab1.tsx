@@ -6,9 +6,9 @@ import {
     IonToolbar,
 } from "@ionic/react";
 import "./Tab1.css";
-import PokemonList from "../components/PokemonList";
 import { css } from "../../styled-system/css";
 import ErrorBoundary from "../components/Error";
+import PokemonList from "../components/PokemonList";
 
 const Tab1: React.FC = () => {
     return (
@@ -21,9 +21,9 @@ const Tab1: React.FC = () => {
             <IonContent fullscreen>
                 <div
                     className={css({
-                        marginTop: 50,
                     })}
                 >
+
                     <PokemonList></PokemonList>
                 </div>
             </IonContent>

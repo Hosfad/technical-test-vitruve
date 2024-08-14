@@ -1,24 +1,23 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useInfiniteQuery } from "react-query";
-import { getAllPokemon } from "../requests";
-import { Pokemon } from "../types";
+import React, {  useEffect, useRef, useState } from "react";
 import { css } from "../../styled-system/css";
-import { center } from "../../styled-system/patterns";
-import { motion, useInView } from "framer-motion";
-import PokemonWidget from "./PokemonWidget";
+import { Pokemon } from "../types";
+import {  useInView } from "framer-motion";
+import {  getAllPokemon, runSearch } from "../utils";
+import { useInfiniteQuery } from "react-query";
+import PokemonCard from "./PokemonCard";
 
 function PokemonList() {
+    // Incremental loading with Infinite scroll
     const {
         data: pokemonData,
-        isLoading,
-        error,
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
     } = useInfiniteQuery(
         "pokemon",
         async ({ pageParam = 1 }) => {
-            return await getAllPokemon(pageParam);
+            const data = await getAllPokemon(pageParam);
+            return data;
         },
         {
             getNextPageParam: (lastPage, pages) => {
@@ -26,125 +25,123 @@ function PokemonList() {
                     return pages.length + 1;
                 }
             },
+            onSuccess: (data) => {
+                const all = data.pages.map((page) => page.results).flat();
+                console.log(all.length);
+                setAllPokemon(all);
+                setCurrentPokemon(all);
+            },
         }
     );
 
-    const loadMoreRef = useRef(null);
-
-
+    const loadMoreRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(loadMoreRef, {
         once: false,
     });
 
+    const [allPokemon, setAllPokemon] = useState<Pokemon[]>(
+        pokemonData?.pages.map((page) => page.results).flat() || []
+    );
+    const [isFetching, setIsFetching] = useState(isFetchingNextPage);
+    const [currentPokemon, setCurrentPokemon] = useState<Pokemon[]>(allPokemon);
+
+    const [searchQuery, setSearchQuery] = useState<string | undefined>(
+        undefined
+    );
+
     useEffect(() => {
-        if (isInView && hasNextPage && !isFetchingNextPage) {
+        if (isInView && hasNextPage && !isFetching && !searchQuery) {
             fetchNextPage();
         }
-    }, [isInView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    }, [isInView, hasNextPage, isFetching, setIsFetching, fetchNextPage]);
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {JSON.stringify(error, null, 2)}</div>;
+    async function handleSearch(query: string) {
+        setSearchQuery(query);
+        if (query.length >= 1) {
+            setIsFetching(true);
+            const results = await runSearch(query);
+            setCurrentPokemon(results);
+            setIsFetching(false);
+        } else {
+            setCurrentPokemon(allPokemon);
+        }
     }
 
     return (
-        <div  className={center({ h: "full" })}>
+        <div
+            className={css({
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+                padding: 4,
+                borderRadius: 4,
+                width: "100%",
+                height: "100%",
+            })}
+        >
+            <input
+                className={css({
+                    padding: 4,
+                    width: "100%",
+                    border: "1px solid ",
+                    borderColor: "yellow.300",
+                    _placeholder: {
+                        color: "yellow.300",
+                    },
+                    borderRadius: 4,
+                })}
+                placeholder="Search pokemon"
+                onChange={(e) => handleSearch(e.target.value)}
+                onTouchStart={(e) => e.stopPropagation()}
+                onTouchEnd={(e) => e.stopPropagation()}
+            ></input>
             <div
                 className={css({
                     display: "grid",
-                    position: "relative",
-                    gridTemplateColumns: "1fr",
-                    gap: 6,
-                    fontWeight: "semibold",
-                    color: "yellow.300",
-                    textAlign: "center",
-                    textStyle: "4xl",
-                    "@media(min-width: 768px)": {
-                        gridTemplateColumns: "repeat(3, 1fr)",
-                    },
+                    gridTemplateColumns:
+                        "repeat(auto-fill, minmax(260px, 1fr))",
+                    gap: 4,
+                color: "yellow.300",
                 })}
-
             >
-                {pokemonData?.pages.map((page, i) =>
-                    page.results.map((pokemon) => (
-                        <PokemonListItem key={pokemon.name} pokemon={pokemon} />
-                    ))
-                )}
+                {currentPokemon.map((p, idx) => (
+                    <div key={p.name + "-" + idx}>
+                        <PokemonCard key={p.name} pokemon={p} />
+                    </div>
+                ))}
 
-                <div
-                    ref={loadMoreRef}
-                    className={css({
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: 4,
-                        marginTop: 4,
-                    })}
-                >
-                    {hasNextPage ? (
-                        isFetchingNextPage ? (
-                            <div>Loading more...</div>
+                {!searchQuery && (
+                    <div
+                        ref={loadMoreRef}
+                        className={css({
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: 4,
+                            marginTop: 4,
+                        })}
+                    >
+                        {hasNextPage ? (
+                            isFetchingNextPage ? (
+                                <div>Loading more...</div>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        fetchNextPage();
+                                    }}
+                                >
+                                    Load more
+                                </button>
+                            )
                         ) : (
-                            <button
-                                onClick={() => {
-                                    fetchNextPage();
-                                }}
-                            >
-                                Load more
-                            </button>
-                        )
-                    ) : (
-                        <></>
-                    )}
-                </div>
+                            <></>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
-const PokemonListItem = ({ pokemon }: { pokemon: Pokemon }) => {
-    const ref = React.useRef(null);
-    const isInView = useInView(ref, { once: true });
 
-    const [widgetOpen, setWidgetOpen] = React.useState(false);
-
-    return (
-        <motion.div
-            ref={ref}
-            className={css({
-                border: "1px solid",
-                borderColor: "yellow.300",
-                borderRadius: 5,
-                padding: 10,
-                alignItems: "center",
-                cursor: "pointer",
-            })}
-            initial={{ scale: 0, opacity: 0, x: -100 }}
-            animate={isInView ? { scale: 1, opacity: 1, x: 0 } : {}}
-            onClick={() => setWidgetOpen(!widgetOpen)}
-        >
-            {/** Name and Image */}
-            <div
-                className={css({
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "between",
-                })}
-            >
-                <img src={pokemon.sprites?.front_default} alt={pokemon.name} />
-                <h1>{pokemon.name}</h1>
-            </div>
-
-            <PokemonWidget
-                pokemon={pokemon}
-                isOpen={widgetOpen}
-                setOpen={setWidgetOpen}
-            />
-        </motion.div>
-    );
-};
 
 export default PokemonList;
