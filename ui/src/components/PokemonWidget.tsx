@@ -28,7 +28,7 @@ function PokemonWidget({
 }) {
     if (!pokemon) return null;
     const widgetRef = useRef<HTMLDivElement>(null);
-
+    console.log(pokemon);
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (
@@ -75,6 +75,7 @@ function PokemonWidget({
                             flexDirection: "row",
                             alignItems: "center",
                             justifyContent: "between",
+                            marginTop : 8
                         })}
                     >
                         {isOpen && (
@@ -90,17 +91,18 @@ function PokemonWidget({
                                     borderRadius: "10%",
                                     padding : 1,
                                     paddingX : 3,
-                                    zIndex: 1000,
-                                    cursor : "pointer"
+                                    cursor : "pointer",
+                                    marginTop : -5
                                 })}
                             >
                                 x
                             </motion.div>
                         )}
-
+                        
                         <img
                             src={pokemon.sprites?.front_default}
                             alt={pokemon.name}
+                            className={css({ width: 100 , height: 100})}
                         />
                         <h1>{capitalizeFirstLetter(pokemon.name)}</h1>
                     </div>
@@ -115,7 +117,7 @@ function PokemonWidget({
                                     key={imgUrl}
                                     src={imgUrl}
                                 ></img>
-                            );
+                            )
                         })}
                     </div>
 

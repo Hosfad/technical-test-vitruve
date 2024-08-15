@@ -4,4 +4,4 @@ node_modules
 /api/node_modules
 /api/build
 /api/.env
-/api/data
+/api/data/users

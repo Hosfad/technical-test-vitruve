@@ -1,8 +1,8 @@
-import React, {  useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { css } from "../../styled-system/css";
 import { Pokemon } from "../types";
-import {  useInView } from "framer-motion";
-import {  getAllPokemon, runSearch } from "../utils";
+import { useInView } from "framer-motion";
+import { getAllPokemon, runSearch } from "../utils";
 import { useInfiniteQuery } from "react-query";
 import PokemonCard from "./PokemonCard";
 
@@ -27,7 +27,6 @@ function PokemonList() {
             },
             onSuccess: (data) => {
                 const all = data.pages.map((page) => page.results).flat();
-                console.log(all.length);
                 setAllPokemon(all);
                 setCurrentPokemon(all);
             },
@@ -99,16 +98,20 @@ function PokemonList() {
                 className={css({
                     display: "grid",
                     gridTemplateColumns:
-                        "repeat(auto-fill, minmax(260px, 1fr))",
+                        "repeat(auto-fill, minmax(300px, 1fr))",
                     gap: 4,
-                color: "yellow.300",
+                    color: "yellow.300",
                 })}
             >
-                {currentPokemon.map((p, idx) => (
-                    <div key={p.name + "-" + idx}>
-                        <PokemonCard key={p.name} pokemon={p} />
-                    </div>
-                ))}
+                {currentPokemon.map((p, idx) => {
+                    const isPartial = Object.keys(p).length === 2;
+
+                    return (
+                        <div key={p.name + "-" + idx}>
+                            <PokemonCard key={p.name} pokemon={isPartial ? p.name : p} />
+                        </div>
+                    );
+                })}
 
                 {!searchQuery && (
                     <div
@@ -141,7 +144,5 @@ function PokemonList() {
         </div>
     );
 }
-
-
 
 export default PokemonList;

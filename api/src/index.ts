@@ -2,14 +2,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRouter from "./routers/user.router";
-import { getAllPokemon } from "./utils";
 import { readFileSync } from "fs";
 dotenv.config();
 
 
 const app = express();
-
-
 
 app.use(
     cors({
