@@ -6,18 +6,16 @@ export type Pokemon = {
 
     height: number;
     weight: number;
-
-    forms: PokemonData[];
     sprites: {
         front_default: string;
     };
 
-    stats: PokemonStats[];
-    types: {
+    forms?: PokemonData[];
+    stats?: PokemonStats[];
+    types?: {
         type: PokemonData;
     }[];
 };
-
 export type PokemonData = {
     name: string;
     url: string;
@@ -40,4 +38,5 @@ export type User = {
         };
     }[];
     accessToken?: string;
+    customPokemon?: Pokemon[];
 };

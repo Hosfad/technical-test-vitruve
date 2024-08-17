@@ -25,6 +25,8 @@ export default function authenticateUser(
         }
         // Should also check if token is expired but for the sake of this test we are not gonna do that.
 
+        // @ts-ignore
+        delete user.password;
         (req as any).user = user;
 
         next();

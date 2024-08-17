@@ -42,6 +42,7 @@ const PokemonCard = ({ pokemon }: { pokemon: Pokemon | string }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "between",
+                    cursor: "pointer",
                 })}
                 initial={{ scale: 0, opacity: 0, x: -100 }}
                 animate={isInView ? { scale: 1, opacity: 1, x: 0 } : {}}
@@ -59,7 +60,7 @@ const PokemonCard = ({ pokemon }: { pokemon: Pokemon | string }) => {
                         overflow: "hidden",
                     })}
                 >
-                    {currentPokemon?.sprites.front_default ? (
+                    {currentPokemon?.sprites?.front_default ? (
                         <img
                             src={currentPokemon.sprites.front_default}
                             alt={currentPokemon.name}

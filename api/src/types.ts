@@ -1,17 +1,20 @@
 export type Pokemon = {
+    id: number;
+    isCustomPokemon: boolean;
+
     name: string;
 
     height: number;
     weight: number;
-
-    forms: PokemonData[];
     sprites: {
         front_default: string;
     };
 
-    stats: PokemonStats[];
-    types: string[];
-    evolutions: PokemonData[];
+    forms?: PokemonData[];
+    stats?: PokemonStats[];
+    types?: {
+        type: PokemonData;
+    }[];
 };
 
 export type PokemonData = {
@@ -36,4 +39,5 @@ export type User = {
         };
     }[];
     accessToken?: string;
+    customPokemon: Pokemon[];
 };

@@ -64,10 +64,6 @@ function SideWidget({
         <AnimatePresence>
             {isOpen && (
                 <motion.div
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }}
                     initial={initial}
                     animate={animate}
                     exit={exit}

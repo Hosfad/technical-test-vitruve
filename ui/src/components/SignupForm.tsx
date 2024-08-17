@@ -4,6 +4,7 @@ import { css } from "../../styled-system/css";
 import { center } from "../../styled-system/patterns";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import Layout from "./Layout";
+import Input from "./Input";
 
 function SingupForm() {
     const [cachedUser, setCachedUser] = useLocalStorage("user", null);
@@ -46,59 +47,26 @@ function SingupForm() {
                 className={css({ display: "grid", gap: 8, width: "full" })}
                 onSubmit={handleSubmit}
             >
-                <input
-                    className={css({
-                        padding: "4",
-                        width: "100%",
-                        border: "1px solid",
-                        borderColor: "yellow.300",
-                        _placeholder: {
-                            color: "yellow.300",
-                        },
-                        borderRadius: "4",
-                    })}
-                    placeholder="Username"
-                    id="username"
-                    name="username"
+                <Input
                     type="text"
-                    required={true}
-                ></input>
+                    name="username"
+                    required
+                    placeholder="Username"
+                ></Input>
 
-                <input
-                    className={css({
-                        padding: "4",
-                        width: "100%",
-                        border: "1px solid",
-                        borderColor: "yellow.300",
-                        _placeholder: {
-                            color: "yellow.300",
-                        },
-                        borderRadius: "4",
-                    })}
-                    placeholder="Email"
-                    id="email"
-                    name="email"
+                <Input
                     type="email"
-                    required={true}
-                ></input>
+                    name="email"
+                    required
+                    placeholder="Email"
+                ></Input>
 
-                <input
-                    className={css({
-                        padding: "4",
-                        width: "100%",
-                        border: "1px solid",
-                        borderColor: "yellow.300",
-                        _placeholder: {
-                            color: "yellow.300",
-                        },
-                        borderRadius: "4",
-                    })}
-                    placeholder="Password"
-                    id="password"
-                    name="password"
+                <Input
                     type="password"
-                    required={true}
-                ></input>
+                    name="password"
+                    required
+                    placeholder="Password"
+                ></Input>
 
                 <button
                     className={css({
@@ -113,7 +81,7 @@ function SingupForm() {
                         height: "50px",
                     })}
                 >
-                    Sing up
+                    Sign up
                 </button>
             </form>
             <p>

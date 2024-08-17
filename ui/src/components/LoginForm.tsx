@@ -5,9 +5,13 @@ import { center } from "../../styled-system/patterns";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useIonRouter } from "@ionic/react";
 import Layout from "./Layout";
+import Input from "./Input";
+import { color } from "framer-motion";
 
 function LoginForm() {
     const [cachedUser, setCachedUser] = useLocalStorage("user", null);
+
+    const [errMessage, setErrMessage] = React.useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -15,6 +19,10 @@ function LoginForm() {
         const email = e.currentTarget.email.value;
         const password = e.currentTarget.password.value;
 
+        if (!email || !password) {
+            console.error("Email and password are required");
+            return;
+        }
         const res = await fetch(`${import.meta.env.VITE_API_URL}/users/login`, {
             method: "POST",
             headers: {
@@ -22,6 +30,7 @@ function LoginForm() {
             },
             body: JSON.stringify({ email, password }),
         });
+
         if (res.ok) {
             const data = await res.json();
             setCachedUser(data);
@@ -30,6 +39,9 @@ function LoginForm() {
             } else {
                 window.location.href = "/dashboard";
             }
+        } else {
+            alert("Invalid email or password");
+            setErrMessage("Invalid email or password");
         }
     };
 
@@ -38,45 +50,27 @@ function LoginForm() {
             <h1 className={css({ color: "yellow.300" })}>
                 Login to you'r pokedex account
             </h1>
+
+            {errMessage && (
+                <p className={css({ color: "red.400" })}>{errMessage}</p>
+            )}
             <form
                 className={css({ display: "grid", gap: 8, width: "full" })}
                 onSubmit={handleSubmit}
             >
-                <input
-                    className={css({
-                        padding: "4",
-                        width: "100%",
-                        border: "1px solid",
-                        borderColor: "yellow.300",
-                        _placeholder: {
-                            color: "yellow.300",
-                        },
-                        borderRadius: "4",
-                    })}
-                    placeholder="Email"
-                    id="email"
-                    name="email"
+                <Input
                     type="email"
-                    required={true}
-                ></input>
+                    name="email"
+                    required
+                    placeholder="Email"
+                ></Input>
 
-                <input
-                    className={css({
-                        padding: "4",
-                        width: "100%",
-                        border: "1px solid",
-                        borderColor: "yellow.300",
-                        _placeholder: {
-                            color: "yellow.300",
-                        },
-                        borderRadius: "4",
-                    })}
-                    placeholder="Password"
-                    id="password"
-                    name="password"
+                <Input
                     type="password"
-                    required={true}
-                ></input>
+                    name="password"
+                    required
+                    placeholder="Password"
+                ></Input>
 
                 <button
                     className={css({

@@ -9,6 +9,7 @@ import {
     markAsFavorite,
 } from "../../utils";
 import SideWidget from "../SideWidget";
+import CreateOrEditPokemonWidget from "./CreateOrEditPokemonWidget";
 
 function PokemonWidget({
     pokemon,
@@ -23,8 +24,6 @@ function PokemonWidget({
     cachedUser: User | null;
     setCachedUser: (user: User | null) => void;
 }) {
-    const [isEditing, setIsEditing] = React.useState(false);
-
     return pokemon ? (
         <SideWidget isOpen={isOpen} setIsOpen={setOpen}>
             <div
@@ -74,7 +73,7 @@ function PokemonWidget({
                     gap: 4,
                 })}
             >
-                {pokemon.stats.map((stat) => (
+                {pokemon.stats?.map((stat) => (
                     <StatsProgressBar
                         key={stat.stat.name}
                         stat={stat.stat.name}
@@ -111,30 +110,17 @@ function PokemonWidget({
                     }
                 }}
             >
-                {cachedUser &&
+                {!pokemon.isCustomPokemon &&
+                cachedUser &&
                 cachedUser.favorites?.find((p) => p.name === pokemon.name)
                     ? "Unmark as favorite"
                     : "Mark as favorite"}
             </button>
-            <button
-                className={css({
-                    padding: 2,
-                    backgroundColor: "yellow.300",
-                    color: "black",
-                    border: "1px solid",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    width: "100%",
-                    height: "40px",
-                    marginTop: 8,
-                })}
-                onClick={() => setIsEditing(true)}
-            >
-                Edit Pokemon
-            </button>
-            <SideWidget isOpen={isEditing} setIsOpen={setIsEditing}>
-                <h1>Edit Pokemon</h1>
-            </SideWidget>
+            {pokemon.isCustomPokemon && (
+                <CreateOrEditPokemonWidget
+                    pokemon={pokemon}
+                ></CreateOrEditPokemonWidget>
+            )}
         </SideWidget>
     ) : (
         <></>

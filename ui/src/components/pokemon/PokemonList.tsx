@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { css } from "../../../styled-system/css";
 import { Pokemon, User } from "../../types";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import {
     getAllPokemon,
     getAllTypes,
@@ -11,10 +11,24 @@ import {
 import PokemonCard from "./PokemonCard";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { get, set, del } from "idb-keyval";
+import { get, set, del, update } from "idb-keyval";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import SideWidget from "../SideWidget";
+import CreateOrEditPokemonWidget from "./CreateOrEditPokemonWidget";
+import PokemonTypeSelect from "./PokemonTypeSelect";
 
 function PokemonList() {
+    const [cachedUser, setCachedUser] = useLocalStorage<User | null>(
+        "user",
+        null
+    );
+    const customPokemon = cachedUser?.customPokemon || [];
+
+    const loadMoreRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(loadMoreRef, {
+        once: false,
+    });
+
     // Incremental loading with Infinite scroll
     const {
         data: pokemonData,
@@ -35,7 +49,7 @@ function PokemonList() {
             }
 
             const data = await getAllPokemon(pageParam as number);
-            const allData = [...allPokemon, ...data.results];
+            const allData = [...customPokemon, ...allPokemon, ...data.results];
             setAllPokemon(allData);
             setCurrentPokemon(allData);
             await set("pokemon", allData);
@@ -53,27 +67,20 @@ function PokemonList() {
         },
     });
 
-    const loadMoreRef = useRef<HTMLDivElement>(null);
-    const isInView = useInView(loadMoreRef, {
-        once: false,
-    });
-
     const [allPokemon, setAllPokemon] = useState<Pokemon[]>(
         pokemonData?.pages
             .map((page: { results: any }) => page.results)
             .flat() || []
     );
     const [isFetching, setIsFetching] = useState(isFetchingNextPage);
-    const [currentPokemon, setCurrentPokemon] = useState<Pokemon[]>(allPokemon);
+    const [currentPokemon, setCurrentPokemon] = useState<Pokemon[]>([
+        ...allPokemon,
+    ]);
 
     const [searchQuery, setSearchQuery] = useState<string | undefined>(
         undefined
     );
     const [currentFilter, setCurrentFilter] = useState<string | undefined>("");
-    const [cachedUser, setCachedUser] = useLocalStorage<User | null>(
-        "user",
-        null
-    );
 
     useEffect(() => {
         if (
@@ -118,7 +125,7 @@ function PokemonList() {
         }
         setCurrentFilter(type);
         const results = allPokemon.filter((p) =>
-            p.types.some((t) => t.type.name === type)
+            p.types?.some((t) => t.type.name === type)
         );
         setCurrentPokemon(results);
     }
@@ -162,40 +169,10 @@ function PokemonList() {
                     onTouchEnd={(e) => e.stopPropagation()}
                 ></input>
 
-                <select
-                    className={css({
-                        padding: 4,
-                        width: "100%",
-                        border: "1px solid ",
-                        borderColor: "yellow.300",
-                        borderRadius: 4,
-                    })}
-                    onChange={handleFilter}
-                >
-                    <option
-                        style={{
-                            backgroundColor: "black",
-                            color: "yellow.300",
-                        }}
-                        value=""
-                    >
-                        All Types
-                    </option>
-                    {getAllTypes().map((type, idx) => {
-                        return (
-                            <option
-                                key={type + "-" + idx}
-                                style={{
-                                    backgroundColor: "black",
-                                    color: "yellow.300",
-                                }}
-                                value={type.name}
-                            >
-                                {type.name}
-                            </option>
-                        );
-                    })}
-                </select>
+                <PokemonTypeSelect
+                    incdludeAllTypes
+                    handleChange={handleFilter}
+                />
             </div>
 
             <div
@@ -207,6 +184,8 @@ function PokemonList() {
                     color: "yellow.300",
                 })}
             >
+                <CreateOrEditPokemonWidget />
+
                 {currentPokemon
                     .sort((p1, p2) => {
                         const isP1Favorite = cachedUser?.favorites.find(
