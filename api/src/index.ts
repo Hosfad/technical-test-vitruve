@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { readFile } from "fs/promises";
 import userRouter from "./routers/user.router";
+import { Pokemon } from "./types";
 import { getError, getUserThroughToken } from "./utils";
 dotenv.config();
 
@@ -25,9 +26,14 @@ app.use("/users", userRouter);
 
 app.get("/search", async (req, res) => {
     const searchQuery = req.query.q as string;
-    if (!searchQuery) {
-        return getError(res, 400)("Missing search query");
+    const filter = req.query.filter as string;
+
+    console.log(req.query);
+
+    if (!searchQuery && !filter) {
+        return getError(res, 400)("No search query or filter provided");
     }
+
     const accessToken = req.query.accessToken as string;
     const user = accessToken ? await getUserThroughToken(accessToken) : null;
 
@@ -36,8 +42,8 @@ app.get("/search", async (req, res) => {
         return getError(res, 500)("Failed to read search index");
     }
 
-    let index = JSON.parse(indexRaw.toString());
-    index = index.map((p: any) => {
+    let index: Partial<Pokemon>[] = JSON.parse(indexRaw.toString());
+    index = index.map((p: Partial<Pokemon>) => {
         return { ...p, isCustomPokemon: false, isPartial: true };
     });
 
@@ -60,11 +66,26 @@ app.get("/search", async (req, res) => {
         index.push(...customPokemon);
     }
 
-    const results = index.filter((p: any) =>
-        p.name.includes(searchQuery.toLowerCase())
-    );
+    let results: Partial<Pokemon>[] = [];
 
-    console.log(`Search for ${searchQuery} returned ${results.length} results`);
+    for (const pokemon of index) {
+        if (searchQuery && searchQuery !== "undefined") {
+            if (pokemon.name?.includes(searchQuery)) {
+                results.push(pokemon);
+            }
+        } else if (filter && filter !== "undefined") {
+            const types = pokemon.types?.map((t) => t.type.name);
+            console.log("types ", types);
+
+            if (types?.includes(filter)) {
+                results.push(pokemon);
+            }
+        }
+    }
+
+    console.log(
+        `Search for q ${searchQuery}, filter ${filter} returned ${results.length} results`
+    );
 
     res.json({ results });
 });

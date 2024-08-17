@@ -148,6 +148,12 @@ function PokemonWidget({
                     pokemon={pokemon}
                 ></CreateOrEditPokemonWidget>
             )}
+
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
         </SideWidget>
     ) : (
         <></>

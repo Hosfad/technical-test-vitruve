@@ -80,7 +80,7 @@ const PokemonCard = ({
                         <p>N/A</p>
                     )}
                 </div>
-                <p>{capitalizeFirstLetter(currentPokemon?.name || "")}</p>
+                <p>{capitalizeFirstLetter(currentPokemon?.name || "N/A")}</p>
             </motion.div>
 
             <PokemonWidget

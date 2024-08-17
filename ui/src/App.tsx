@@ -39,6 +39,7 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/palettes/dark.always.css";
 
 /* Theme variables */
+import { useEffect } from "react";
 import { css } from "../styled-system/css";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import "./index.css";
@@ -56,6 +57,34 @@ const App: React.FC = () => {
         "user",
         null
     );
+    const [lastRefresh, setLastRefresh] = useLocalStorage<number>(
+        "lastRefresh",
+        0
+    );
+
+    // Refresh the user data if the user is online to keep the data up to date
+
+    useEffect(() => {
+        if (
+            cachedUser &&
+            cachedUser.accessToken &&
+            navigator.onLine &&
+            lastRefresh + 300000 < Date.now()
+        ) {
+            setLastRefresh(Date.now());
+            fetch(`${import.meta.env.VITE_API_URL}/users/@me`, {
+                headers: {
+                    Authorization: `Bearer ${cachedUser.accessToken}`,
+                },
+            }).then(async (res) => {
+                if (res.ok) {
+                    const data = await res.json();
+                    setCachedUser(data);
+                }
+            });
+        }
+    }, []);
+
     return (
         <IonApp>
             <IonHeader>

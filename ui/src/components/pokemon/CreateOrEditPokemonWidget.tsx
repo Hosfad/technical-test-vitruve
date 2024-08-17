@@ -263,6 +263,13 @@ function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
                             </button>
                         )}
                     </div>
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <a href="/dashboard">dashboard</a>
                 </form>
             </SideWidget>
         </>

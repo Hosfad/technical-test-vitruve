@@ -89,14 +89,16 @@ function PokemonList() {
         }
     }, [isInView, hasNextPage, isFetching, setIsFetching, fetchNextPage]);
 
-    async function handleSearch(query: string) {
+    async function handleSearch(query?: string, filter?: string) {
         setSearchQuery(query);
-        if (query.length >= 1) {
+        if (query && query.length >= 1) {
             // Handle online search
             if (navigator.onLine) {
                 setIsFetching(true);
-                const results = await runSearch(
+                const results: Pokemon[] = await runSearch(
                     query,
+
+                    undefined,
                     cachedUser?.accessToken || undefined
                 );
 
@@ -110,6 +112,29 @@ function PokemonList() {
                 p.name.toLowerCase().includes(query.toLowerCase())
             );
             setCurrentPokemon(results);
+        } else if (filter && filter !== "All Types") {
+            setCurrentFilter(filter);
+            if (navigator.onLine) {
+                setIsFetching(true);
+                const results = await runSearch(
+                    undefined,
+                    filter,
+                    cachedUser?.accessToken || undefined
+                );
+                console.log("results ", results);
+                setCurrentPokemon(results);
+                setIsFetching(false);
+                return;
+            }
+            // Handle offline search (Covers only pokemon that are loaded)
+            const cachedData = await get("pokemon");
+            const results = cachedData.filter((p: Partial<Pokemon>) =>
+                p.types?.some(
+                    (t: { type: { name: string } }) =>
+                        t.type.name === currentFilter
+                )
+            );
+            setCurrentPokemon(results);
         } else {
             setCurrentPokemon(allPokemon);
         }
@@ -118,15 +143,17 @@ function PokemonList() {
     function handleFilter(e: React.ChangeEvent<HTMLSelectElement>) {
         const type = e.target.value;
         if (type === "") {
-            setCurrentFilter("");
             setCurrentPokemon(allPokemon);
             return;
         }
         setCurrentFilter(type);
-        const results = allPokemon.filter((p) =>
-            p.types?.some((t) => t.type.name === type)
-        );
-        setCurrentPokemon(results);
+
+        handleSearch(undefined, type).then(() => {
+            const results = allPokemon.filter((p) =>
+                p.types?.some((t) => t.type.name === type)
+            );
+            setCurrentPokemon(results);
+        });
     }
 
     return (
@@ -185,11 +212,17 @@ function PokemonList() {
             >
                 <CreateOrEditPokemonWidget />
 
-                {customPokemon.map((p, idx) => (
-                    <div key={p.name + "-" + idx}>
-                        <PokemonCard key={p.name} pokemon={p} isCustomPokemon />
-                    </div>
-                ))}
+                {!searchQuery &&
+                    !currentFilter &&
+                    customPokemon.map((p, idx) => (
+                        <div key={p.name + "-" + idx}>
+                            <PokemonCard
+                                key={p.name}
+                                pokemon={p}
+                                isCustomPokemon
+                            />
+                        </div>
+                    ))}
 
                 {currentPokemon
                     .sort((p1, p2) => {
@@ -219,7 +252,7 @@ function PokemonList() {
                         );
                     })}
 
-                {!searchQuery && (
+                {!searchQuery && !currentFilter && (
                     <div
                         ref={loadMoreRef}
                         className={css({

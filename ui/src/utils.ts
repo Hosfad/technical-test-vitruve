@@ -77,10 +77,13 @@ export async function markAsFavorite(
 }
 
 export async function runSearch(
-    query: string,
+    query?: string,
+    filter?: string,
     accessToken?: string
 ): Promise<Pokemon[]> {
-    const baseUrl = `${import.meta.env.VITE_API_URL}/search?q=${query}`;
+    const baseUrl = `${
+        import.meta.env.VITE_API_URL
+    }/search?q=${query}&filter=${filter}`;
     const url = accessToken ? `${baseUrl}&accessToken=${accessToken}` : baseUrl;
     const response = await fetch(url);
 
