@@ -141,7 +141,6 @@ userRouter.put(
             ],
         };
         user.customPokemon.push(pokemon);
-
         res.json({ user: await parseUserForResponse(user), pokemon: pokemon });
     }
 );
@@ -157,6 +156,7 @@ userRouter.delete(
         user.customPokemon = user.customPokemon.filter(
             (p) => p.id !== parseInt(id)
         );
+
         res.json(await parseUserForResponse(user));
     }
 );
@@ -205,7 +205,7 @@ userRouter.post(
             pokemon.sprites.front_default = newData.image;
         }
 
-        res.json(await parseUserForResponse(user));
+        res.json({ user: await parseUserForResponse(user), pokemon: pokemon });
     }
 );
 export default userRouter;

@@ -6,7 +6,7 @@ function LoginPage() {
     const [cachedUser, setCachedUser] = useLocalStorage("user", null);
     const history = useHistory();
     if (cachedUser) {
-        history.push("/dashboard");
+        history.push("/");
         return <>Redirecting</>;
     }
 

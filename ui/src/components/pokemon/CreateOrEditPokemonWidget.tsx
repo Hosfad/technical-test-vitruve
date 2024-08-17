@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { update } from "idb-keyval";
 import React from "react";
 import { css } from "../../../styled-system/css";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -69,20 +68,12 @@ function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
             },
             body: JSON.stringify(data),
         });
-        console.log(method);
         if (res.ok) {
             const responseData = await res.json();
             setIsOpen(false);
             setCachedUser(responseData.user as User);
-
-            if (method === "PUT") {
-                await update("pokemon", (pokemons?: Pokemon[]) => {
-                    return [...(pokemons || []), responseData.pokemon];
-                });
-            }
-
-            window.location.reload();
             alert("Pokemon created successfully");
+            window.location.reload();
         }
         setIsEditing(false);
     }
@@ -101,9 +92,6 @@ function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
             const data = await res.json();
             setCachedUser(data);
             setIsOpen(false);
-            await update("pokemon", (pokemons?: Pokemon[]) => {
-                return pokemons?.filter((p) => p.id !== pokemon?.id) || [];
-            });
             alert("Pokemon deleted successfully");
             window.location.reload();
         }

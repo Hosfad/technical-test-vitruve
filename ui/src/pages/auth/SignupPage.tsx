@@ -7,7 +7,7 @@ function SignupPage() {
 
     const history = useHistory();
     if (cachedUser) {
-        history.push("/dashboard");
+        history.push("/");
         return <>Redirecting</>;
     }
 

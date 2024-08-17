@@ -1,3 +1,4 @@
+import { del } from "idb-keyval";
 import React from "react";
 import { Link } from "react-router-dom";
 import { css } from "../../styled-system/css";
@@ -33,6 +34,8 @@ function LoginForm() {
         if (res.ok) {
             const data = await res.json();
             setCachedUser(data);
+            await del("pokemon");
+
             if (window.location.pathname === "/dashboard") {
                 window.location.reload();
             } else {

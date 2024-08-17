@@ -6,7 +6,7 @@ import { Pokemon, User } from "../../types";
 import { getAllPokemon, runSearch } from "../../utils";
 import PokemonCard from "./PokemonCard";
 
-import { get, set } from "idb-keyval";
+import { del, get, set } from "idb-keyval";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import CreateOrEditPokemonWidget from "./CreateOrEditPokemonWidget";
 import PokemonTypeSelect from "./PokemonTypeSelect";
@@ -32,6 +32,7 @@ function PokemonList() {
     } = useInfiniteQuery({
         queryKey: ["pokemon"],
         queryFn: async ({ pageParam = 1 }) => {
+            await del("pokemon");
             const cachedData = await get("pokemon");
             if (
                 cachedData &&
@@ -43,7 +44,7 @@ function PokemonList() {
             }
 
             const data = await getAllPokemon(pageParam as number);
-            const allData = [...customPokemon, ...allPokemon, ...data.results];
+            const allData = [...allPokemon, ...data.results];
             setAllPokemon(allData);
             setCurrentPokemon(allData);
             await set("pokemon", allData);
@@ -183,6 +184,12 @@ function PokemonList() {
                 })}
             >
                 <CreateOrEditPokemonWidget />
+
+                {customPokemon.map((p, idx) => (
+                    <div key={p.name + "-" + idx}>
+                        <PokemonCard key={p.name} pokemon={p} isCustomPokemon />
+                    </div>
+                ))}
 
                 {currentPokemon
                     .sort((p1, p2) => {
