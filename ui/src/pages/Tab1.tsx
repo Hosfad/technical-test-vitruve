@@ -1,29 +1,12 @@
-import {
-    IonContent,
-    IonHeader,
-    IonPage,
-    IonTitle,
-    IonToolbar,
-} from "@ionic/react";
-import "./Tab1.css";
+import { IonContent, IonPage } from "@ionic/react";
 import { css } from "../../styled-system/css";
-import ErrorBoundary from "../components/Error";
-import PokemonList from "../components/PokemonList";
+import PokemonList from "../components/pokemon/PokemonList";
 
 const Tab1: React.FC = () => {
     return (
         <IonPage>
-            <IonHeader>
-                <IonToolbar>
-                    <IonTitle>Pokédex App</IonTitle>
-                </IonToolbar>
-            </IonHeader>
             <IonContent fullscreen>
-                <div
-                    className={css({
-                    })}
-                >
-
+                <div className={css({ marginTop: 20 })}>
                     <PokemonList></PokemonList>
                 </div>
             </IonContent>

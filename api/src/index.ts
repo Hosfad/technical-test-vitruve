@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import userRouter from "./routers/user.router";
 import { readFileSync } from "fs";
+import { getAllUsers, getUserThroughToken } from "./utils";
 dotenv.config();
 
 
@@ -20,7 +21,19 @@ app.use(
 app.use(express.json());
 app.set("json spaces", 2);
 
+// User router
 app.use("/users" , userRouter);
+
+const indexRaw = readFileSync("./data/search-index.json");
+const index = JSON.parse(indexRaw.toString());
+
+index.forEach((p: any) => {
+    app.get(`/pokemon/${p.name}`, (req, res) => {
+        res.json(p);
+    });
+});
+
+
 app.get("/search" , (req, res) => {
 
 const searchQuery = req.query.q as string;

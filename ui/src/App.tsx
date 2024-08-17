@@ -1,12 +1,16 @@
-import { Redirect, Route } from "react-router-dom";
+import { Link, Redirect, Route } from "react-router-dom";
 import {
     IonApp,
+    IonButton,
+    IonHeader,
     IonIcon,
     IonLabel,
     IonRouterOutlet,
     IonTabBar,
     IonTabButton,
     IonTabs,
+    IonTitle,
+    IonToolbar,
     setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -44,27 +48,63 @@ import "@ionic/react/css/palettes/dark.always.css";
 /* Theme variables */
 import "./theme/variables.css";
 import "./index.css";
-import SingupForm from "./components/SingupForm";
+import SignupPage from "./pages/auth/SignupPage";
+import LoginPage from "./pages/auth/LoginPage";
+import Dashboard from "./pages/Dashboard";
+import { css } from "../styled-system/css";
+import { useLocalStorage } from "./hooks/useLocalStorage";
+import { User } from "./types";
 
 setupIonicReact();
 
-const App: React.FC = () => (
-    <IonApp>
-        <IonReactRouter>
+const App: React.FC = () => {
+    const [cachedUser, setCachedUser] = useLocalStorage<User | null>(
+        "user",
+        null
+    );
+    return (
+        <IonApp>
+            <IonHeader>
+                <IonToolbar>
+                    <div
+                        className={css({
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        })}
+                    >
+                        <a href="/">
+                            <IonTitle>Pokédex App</IonTitle>
+                        </a>
+                        <a href="/dashboard">
+                            <IonButton>
+                                {cachedUser ? "Dashboard" : "Login"}
+                            </IonButton>
+                        </a>
+                    </div>
+                </IonToolbar>
+            </IonHeader>
+            <IonReactRouter>
                 <IonRouterOutlet>
                     <Route exact path="/">
                         <Tab1 />
                     </Route>
 
-                    <Route exact path="/signup">
-                        <SingupForm></SingupForm>
+                    <Route exact path="/dashboard">
+                        <Dashboard />
                     </Route>
 
-          
-                </IonRouterOutlet>
+                    <Route exact path="/signup">
+                        <SignupPage />
+                    </Route>
 
-        </IonReactRouter>
-    </IonApp>
-);
+                    <Route exact path="/login">
+                        <LoginPage />
+                    </Route>
+                </IonRouterOutlet>
+            </IonReactRouter>
+        </IonApp>
+    );
+};
 
 export default App;

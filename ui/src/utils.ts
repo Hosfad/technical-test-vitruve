@@ -1,4 +1,4 @@
-import { Pokemon, PokemonData } from "./types";
+import { Pokemon, PokemonData, User } from "./types";
 
 export async function getPokemonDataRaw(
     page?: number
@@ -34,12 +34,34 @@ export async function getAllPokemon(
 export async function getPokemon(name: string): Promise<Pokemon> {
     const url = `https://pokeapi.co/api/v2/pokemon/${name}`;
     const response = await fetch(url);
-    const data = await response.json();
-    return data as Pokemon;
+    const data: Pokemon = (await response.json()) as Pokemon;
+    data.isCustomPokemon = false;
+
+    return data;
 }
 
 export function getPokemonType(type: string) {
     return types.find((t) => t.name === type);
+}
+
+export async function markAsFavorite(
+    accessToken: string,
+    pokemon: string
+): Promise<User | null> {
+    const url = `${import.meta.env.VITE_API_URL}/users/@me/favorite/${pokemon}`;
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+    if (response.ok) {
+        const data = await response.json();
+        return data as User;
+    }
+
+    return null;
 }
 
 export async function runSearch(query: string): Promise<Pokemon[]> {
@@ -57,7 +79,9 @@ export function capitalizeFirstLetter(string: string): string {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-
+export function getAllTypes() {
+    return types;
+}
 
 const types = [
     {

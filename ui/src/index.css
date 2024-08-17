@@ -1,2 +1,7 @@
 @layer reset, base, tokens, recipes, utilities;
 
+@media (max-width: 768px) {
+    .form-mobile {
+      width: 90% !important;
+    }
+  }

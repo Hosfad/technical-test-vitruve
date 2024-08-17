@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { getUserInfo } from "../utils";
+import { getUserInfo, getUserThroughToken } from "../utils";
 
-
-
-
-export default function authenticateUser(req:Request, res:Response, next:NextFunction) {
+export default function authenticateUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     if (!req.headers.authorization) {
         return res.status(401).json({ error: "No authorization header" });
     }
@@ -13,22 +14,20 @@ export default function authenticateUser(req:Request, res:Response, next:NextFun
         return res.status(401).json({ error: "Missing access token" });
     }
     try {
+        const user = getUserThroughToken(token);
+        if (!user) {
+            return res.status(401).json({ error: "User not found" });
+        }
 
-        // we are gonna assume that the token is valid for the sake of this test 
-
-        const tokenValid = true;
+        const tokenValid = token === user.accessToken;
         if (!tokenValid) {
             return res.status(401).json({ error: "Invalid token" });
         }
+        // Should also check if token is expired but for the sake of this test we are not gonna do that.
 
-        const user = getUserInfo(token);
-        if (!user) {
-            return res.status(401).json({ error: "Invalid token" });
-        }
         (req as any).user = user;
 
         next();
-  
     } catch (error) {
         return res.status(401).json({ error: "Invalid token" });
     }

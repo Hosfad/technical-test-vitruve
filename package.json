@@ -25,6 +25,8 @@
     "node": "21.4.0"
   },
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "@tanstack/react-query-persist-client": "^5.51.23",
+    "concurrently": "^8.2.2",
+    "idb-keyval": "^6.2.1"
   }
 }
