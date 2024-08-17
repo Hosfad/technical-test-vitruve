@@ -1,10 +1,9 @@
 import React from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { css } from "../../styled-system/css";
-import { center } from "../../styled-system/patterns";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import Layout from "./Layout";
 import Input from "./Input";
+import Layout from "./Layout";
 
 function SingupForm() {
     const [cachedUser, setCachedUser] = useLocalStorage("user", null);
@@ -12,9 +11,14 @@ function SingupForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const email = e.currentTarget.email.value;
-        const password = e.currentTarget.password.value;
-        const username = e.currentTarget.username.value;
+        const {
+            email: { value: email },
+            password: { value: password },
+            username: { value: username },
+        } = e.currentTarget;
+
+        if (!email || !password || !username)
+            return alert("All fields are required");
 
         const res = await fetch(
             `${import.meta.env.VITE_API_URL}/users/signup`,

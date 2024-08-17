@@ -1,8 +1,8 @@
 import e, { Request, Response } from "express";
+import { readFileSync } from "fs";
 import authenticateUser from "../middleware/authenticateUser";
 import { Pokemon, PokemonData, User } from "../types";
-import { getUserInfo, saveUser } from "../utils";
-import { readFileSync } from "fs";
+import { getError, getUserInfo, saveUser } from "../utils";
 
 const userRouter = e.Router();
 
@@ -10,13 +10,19 @@ type AuthenticatedRequest = Request & {
     user: User;
 };
 
+const parseUserForResponse = async (user: User) => {
+    await saveUser(user);
+    //@ts-ignore
+    delete user.password;
+    return user;
+};
+
 userRouter.get(
     "/@me",
     authenticateUser,
     async (req: Request, res: Response) => {
         const authenticatedReq = req as AuthenticatedRequest;
-
-        res.json(authenticatedReq.user);
+        res.json(await parseUserForResponse(authenticatedReq.user));
     }
 );
 
@@ -31,12 +37,12 @@ userRouter.get(
         const includes = user.favorites.find((p) => p.name === pokemon);
         const searchIndex = readFileSync("./data/search-index.json");
         const index = JSON.parse(searchIndex.toString());
-        console.log(pokemon);
         const desiredPokemon = index.find(
             (p: PokemonData) => p.name === pokemon
         );
+        const notFound = getError(res, 404);
         if (!desiredPokemon) {
-            return res.status(404).json({ error: "Pokemon not found" });
+            return notFound("Pokemon not found");
         }
 
         if (!includes) {
@@ -44,24 +50,21 @@ userRouter.get(
         } else {
             user.favorites = user.favorites.filter((p) => p.name !== pokemon);
         }
-
-        saveUser(user);
-        // @ts-ignore
-        delete user.password;
-        res.json(user);
+        res.json(await parseUserForResponse(user));
     }
 );
 
 userRouter.post("/signup", async (req: Request, res: Response) => {
     const { email, password, username } = req.body;
 
+    const badRequest = getError(res, 404);
     if (!email || !password || !username) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return badRequest("Missing required fields");
     }
 
-    const exists = getUserInfo(email);
+    const exists = await getUserInfo(email);
     if (exists) {
-        return res.status(400).json({ error: "User already exists" });
+        return badRequest("User already exists");
     }
 
     const accessToken = Math.random().toString(36) + Math.random().toString(36);
@@ -77,47 +80,23 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
         accessToken,
     };
 
-    saveUser(user);
-    // @ts-ignore
-    delete user.password;
-    res.json(user);
+    res.json(await parseUserForResponse(user));
 });
 
 userRouter.post("/login", async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return getError(res, 400)("Missing required fields");
     }
 
-    const user = getUserInfo(email);
-    console.log(user);
+    const user = await getUserInfo(email);
     if (!user || user.password !== password) {
-        return res.status(401).json({ error: "Invalid email or password" });
+        return getError(res, 401)("Invalid email or password");
     }
 
-    saveUser(user);
-    // @ts-ignore
-    delete user.password;
-    res.json(user);
+    res.json(await parseUserForResponse(user));
 });
-userRouter.delete(
-    "/pokemon/:id",
-    authenticateUser,
-    async (req: Request, res: Response) => {
-        const authenticatedReq = req as AuthenticatedRequest;
-        const { id } = req.params;
-        const user = authenticatedReq.user;
-        if (!user.customPokemon) user.customPokemon = [];
-        user.customPokemon = user.customPokemon.filter(
-            (p) => p.id !== parseInt(id)
-        );
-        saveUser(user);
-        // @ts-ignore
-        delete user.password;
-        res.json(user);
-    }
-);
 
 userRouter.put(
     "/pokemon",
@@ -138,7 +117,7 @@ userRouter.put(
             !data.types ||
             !data.image
         ) {
-            return res.status(400).json({ error: "Missing required fields" });
+            return getError(res, 400)("Missing required fields");
         }
 
         const user = authenticatedReq.user;
@@ -162,10 +141,71 @@ userRouter.put(
             ],
         };
         user.customPokemon.push(pokemon);
-        saveUser(user);
-        // @ts-ignore
-        delete user.password;
-        res.json({ user: user, pokemon: pokemon });
+
+        res.json({ user: await parseUserForResponse(user), pokemon: pokemon });
+    }
+);
+
+userRouter.delete(
+    "/pokemon/:id",
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const authenticatedReq = req as AuthenticatedRequest;
+        const { id } = req.params;
+        const user = authenticatedReq.user;
+        if (!user.customPokemon) user.customPokemon = [];
+        user.customPokemon = user.customPokemon.filter(
+            (p) => p.id !== parseInt(id)
+        );
+        res.json(await parseUserForResponse(user));
+    }
+);
+
+userRouter.post(
+    "/pokemon/:id",
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const authenticatedReq = req as AuthenticatedRequest;
+        const { id } = req.params;
+
+        const user = authenticatedReq.user;
+        const pokemon = user.customPokemon.find((p) => p.id === parseInt(id));
+        if (!pokemon) {
+            return getError(res, 404)("Pokemon not found");
+        }
+
+        const newData = req.body as {
+            height: number | null;
+            weight: number | null;
+            name: string | null;
+            types: string | null;
+            image: string | null;
+        };
+
+        if (newData.height) {
+            pokemon.height = newData.height;
+        }
+        if (newData.weight) {
+            pokemon.weight = newData.weight;
+        }
+        if (newData.name) {
+            pokemon.name = newData.name;
+        }
+        if (newData.types) {
+            pokemon.types = [
+                {
+                    type: {
+                        name: newData.types,
+                        url: "",
+                    },
+                },
+            ];
+        }
+        if (newData.image) {
+            pokemon.sprites.front_default = newData.image;
+        }
+
+        res.json(await parseUserForResponse(user));
     }
 );
 export default userRouter;

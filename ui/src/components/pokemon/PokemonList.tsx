@@ -1,19 +1,13 @@
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import { css } from "../../../styled-system/css";
 import { Pokemon, User } from "../../types";
-import { motion, useInView } from "framer-motion";
-import {
-    getAllPokemon,
-    getAllTypes,
-    getPokemonType,
-    runSearch,
-} from "../../utils";
+import { getAllPokemon, runSearch } from "../../utils";
 import PokemonCard from "./PokemonCard";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { get, set, del, update } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import SideWidget from "../SideWidget";
 import CreateOrEditPokemonWidget from "./CreateOrEditPokemonWidget";
 import PokemonTypeSelect from "./PokemonTypeSelect";
 
@@ -100,7 +94,11 @@ function PokemonList() {
             // Handle online search
             if (navigator.onLine) {
                 setIsFetching(true);
-                const results = await runSearch(query);
+                const results = await runSearch(
+                    query,
+                    cachedUser?.accessToken || undefined
+                );
+
                 setCurrentPokemon(results);
                 setIsFetching(false);
                 return;
@@ -200,13 +198,15 @@ function PokemonList() {
                         return 0;
                     })
                     .map((p, idx) => {
-                        const isPartial = Object.keys(p).length === 2;
-
+                        const isPartial = Object.keys(p).length === 3;
                         return (
                             <div key={p.name + "-" + idx}>
                                 <PokemonCard
                                     key={p.name}
-                                    pokemon={isPartial ? p.name : p}
+                                    pokemon={
+                                        p.isPartial || isPartial ? p.name : p
+                                    }
+                                    isCustomPokemon={p.isCustomPokemon}
                                 />
                             </div>
                         );

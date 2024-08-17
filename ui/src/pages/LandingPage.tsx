@@ -2,7 +2,7 @@ import { IonContent, IonPage } from "@ionic/react";
 import { css } from "../../styled-system/css";
 import PokemonList from "../components/pokemon/PokemonList";
 
-const Tab1: React.FC = () => {
+const LandingPage: React.FC = () => {
     return (
         <IonPage>
             <IonContent fullscreen>
@@ -14,4 +14,4 @@ const Tab1: React.FC = () => {
     );
 };
 
-export default Tab1;
+export default LandingPage;

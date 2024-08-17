@@ -1,10 +1,8 @@
-import React, { useEffect, useRef } from "react";
-import { Pokemon, User } from "../../types";
+import React from "react";
 import { css } from "../../../styled-system/css";
-import { AnimatePresence, motion } from "framer-motion";
+import { Pokemon, User } from "../../types";
 import {
     capitalizeFirstLetter,
-    getPokemon,
     getPokemonType,
     markAsFavorite,
 } from "../../utils";

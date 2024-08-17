@@ -1,6 +1,6 @@
 import React from "react";
-import { center } from "../../styled-system/patterns/center";
 import { css } from "../../styled-system/css";
+import { center } from "../../styled-system/patterns/center";
 
 function Layout({ children }: { children: React.ReactNode }) {
     return (

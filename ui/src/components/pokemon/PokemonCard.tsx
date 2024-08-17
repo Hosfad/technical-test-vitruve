@@ -1,35 +1,41 @@
-import { useInView, motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { css } from "../../../styled-system/css";
-import { Pokemon, User } from "../../types";
-import { getPokemon, capitalizeFirstLetter } from "../../utils";
-import PokemonWidget from "./PokemonWidget";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { Pokemon, User } from "../../types";
+import { capitalizeFirstLetter, getPokemon } from "../../utils";
+import PokemonWidget from "./PokemonWidget";
 
-const PokemonCard = ({ pokemon }: { pokemon: Pokemon | string }) => {
+const PokemonCard = ({
+    pokemon,
+    isCustomPokemon,
+}: {
+    pokemon: Pokemon | string;
+    isCustomPokemon?: boolean;
+}) => {
     const ref = React.useRef(null);
     const isInView = useInView(ref, { once: true });
 
     const [currentPokemon, setCurrentPokemon] = React.useState<Pokemon | null>(
         null
     );
-
-    useEffect(() => {
-        if (typeof pokemon === "string") {
-            getPokemon(pokemon).then((data) => {
-                setCurrentPokemon(data);
-            });
-        } else {
-            setCurrentPokemon(pokemon);
-        }
-    }, [pokemon]);
-
     const [isOpen, setOpen] = useState(false);
-
     const [cachedUser, setCachedUser] = useLocalStorage<User | null>(
         "user",
         null
     );
+
+    useEffect(() => {
+        if (typeof pokemon === "string") {
+            getPokemon(pokemon, isCustomPokemon ? cachedUser! : undefined).then(
+                (data) => {
+                    setCurrentPokemon(data);
+                }
+            );
+        } else {
+            setCurrentPokemon(pokemon);
+        }
+    }, [pokemon]);
 
     return (
         <div>

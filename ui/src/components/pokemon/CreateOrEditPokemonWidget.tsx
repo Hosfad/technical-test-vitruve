@@ -1,12 +1,12 @@
-import React, { FormEvent } from "react";
-import { Pokemon, User } from "../../types";
 import { motion } from "framer-motion";
+import { update } from "idb-keyval";
+import React from "react";
 import { css } from "../../../styled-system/css";
-import SideWidget from "../SideWidget";
-import Input from "../Input";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { Pokemon, User } from "../../types";
+import Input from "../Input";
+import SideWidget from "../SideWidget";
 import PokemonTypeSelect from "./PokemonTypeSelect";
-import { del, update } from "idb-keyval";
 
 function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
     const [isOpen, setIsOpen] = React.useState(false);
@@ -211,6 +211,11 @@ function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
                             onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
+                                if (file.size > 1_000_000) {
+                                    alert("Image must be less than 1mb");
+                                    return;
+                                }
+
                                 const reader = new FileReader();
                                 reader.onload = (e) => {
                                     // @ts-ignore

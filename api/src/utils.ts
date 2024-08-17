@@ -1,6 +1,7 @@
-import { existsSync, mkdir, readdirSync, readFileSync, writeFileSync } from "fs";
-import { Pokemon, PokemonData, User } from "./types";
-import axios from "axios";
+import { Response } from "express";
+import { existsSync, mkdir } from "fs";
+import { readdir, readFile, writeFile } from "fs/promises";
+import { User } from "./types";
 
 const usersDir = "./data/users";
 if (!existsSync(usersDir)) {
@@ -9,35 +10,43 @@ if (!existsSync(usersDir)) {
     });
 }
 
-export function getUserInfo(email: string): User | null {
-    const exists = existsSync(`${usersDir}/${email}.json`);
-    if (!exists) {
+export async function getUserInfo(email: string): Promise<User | null> {
+    try {
+        const data = await readFile(`${usersDir}/${email}.json`, "utf-8");
+
+        if (!data) return null;
+
+        return JSON.parse(data);
+    } catch (error) {
+        console.error(error);
         return null;
     }
-
-    const data = readFileSync(`${usersDir}/${email}.json`, "utf-8");
-    return JSON.parse(data);
 }
-export function getAllUsers(): User[] {
+export async function getAllUsers(): Promise<User[]> {
     const all: User[] = [];
-    for (const file of readdirSync(usersDir)) {
-        const data = readFileSync(`${usersDir}/${file}`, "utf-8");
-        all.push(JSON.parse(data) as User);
+    const files = await readdir(usersDir);
+    for (const file of files) {
+        const data = await readFile(`${usersDir}/${file}`, "utf-8");
+        if (!data) continue;
+        all.push(JSON.parse(data));
     }
     return all;
 }
-export function getUserThroughToken(token: string): User | null {
-    const all = getAllUsers();
-    
+export async function getUserThroughToken(token: string): Promise<User | null> {
+    const all = await getAllUsers();
+
     const user = all.find((u) => u.accessToken === token);
     return user || null;
 }
 
-export function saveUser(user: User) {
-    writeFileSync(
+export async function saveUser(user: User) {
+    await writeFile(
         `${usersDir}/${user.email}.json`,
         JSON.stringify(user, null, 2)
     );
 
     return user;
 }
+
+export const getError = (res: Response, status: number) => (error: string) =>
+    res.status(status).json({ error });

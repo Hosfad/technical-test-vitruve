@@ -1,12 +1,9 @@
 import React from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { css } from "../../styled-system/css";
-import { center } from "../../styled-system/patterns";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { useIonRouter } from "@ionic/react";
-import Layout from "./Layout";
 import Input from "./Input";
-import { color } from "framer-motion";
+import Layout from "./Layout";
 
 function LoginForm() {
     const [cachedUser, setCachedUser] = useLocalStorage("user", null);
@@ -16,8 +13,10 @@ function LoginForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const email = e.currentTarget.email.value;
-        const password = e.currentTarget.password.value;
+        const {
+            email: { value: email },
+            password: { value: password },
+        } = e.currentTarget;
 
         if (!email || !password) {
             console.error("Email and password are required");

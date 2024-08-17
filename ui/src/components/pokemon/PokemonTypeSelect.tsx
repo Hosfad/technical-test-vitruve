@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler } from "react";
+import { ChangeEventHandler } from "react";
 import { css } from "../../../styled-system/css";
 import { getAllTypes } from "../../utils";
 

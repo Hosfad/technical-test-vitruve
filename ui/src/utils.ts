@@ -19,7 +19,6 @@ export async function getPokemonDataRaw(
 export async function getAllPokemon(
     page?: number
 ): Promise<{ results: Pokemon[]; next: boolean }> {
-    const time = Date.now();
     const { results: raw, next } = await getPokemonDataRaw(page);
     const all = await Promise.all(
         raw.map(async (p) => {
@@ -31,11 +30,24 @@ export async function getAllPokemon(
     return { results: all as Pokemon[], next };
 }
 
-export async function getPokemon(name: string): Promise<Pokemon> {
+export async function getPokemon(
+    name: string,
+    cachedUser?: User
+): Promise<Pokemon | null> {
+    if (cachedUser) {
+        const customPokemon = cachedUser.customPokemon;
+        const pokemon = customPokemon?.find((p) => p.name === name);
+        if (!pokemon) return null;
+        pokemon.isCustomPokemon = true;
+        pokemon.isPartial = false;
+        return pokemon as Pokemon;
+    }
+
     const url = `https://pokeapi.co/api/v2/pokemon/${name}`;
     const response = await fetch(url);
     const data: Pokemon = (await response.json()) as Pokemon;
     data.isCustomPokemon = false;
+    data.isPartial = false;
 
     return data;
 }
@@ -64,8 +76,12 @@ export async function markAsFavorite(
     return null;
 }
 
-export async function runSearch(query: string): Promise<Pokemon[]> {
-    const url = `${import.meta.env.VITE_API_URL}/search?q=${query}`;
+export async function runSearch(
+    query: string,
+    accessToken?: string
+): Promise<Pokemon[]> {
+    const baseUrl = `${import.meta.env.VITE_API_URL}/search?q=${query}`;
+    const url = accessToken ? `${baseUrl}&accessToken=${accessToken}` : baseUrl;
     const response = await fetch(url);
 
     if (response.ok) {

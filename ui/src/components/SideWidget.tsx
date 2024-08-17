@@ -1,11 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useRef } from "react";
 import { css } from "../../styled-system/css";
-import {
-    capitalizeFirstLetter,
-    getPokemonType,
-    markAsFavorite,
-} from "../utils";
 
 function SideWidget({
     children,

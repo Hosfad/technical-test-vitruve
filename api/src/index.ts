@@ -1,9 +1,9 @@
-import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import express from "express";
+import { readFile } from "fs/promises";
 import userRouter from "./routers/user.router";
-import { readFileSync } from "fs";
-import { getAllUsers, getUserThroughToken } from "./utils";
+import { getError, getUserThroughToken } from "./utils";
 dotenv.config();
 
 const app = express();
@@ -23,23 +23,43 @@ app.set("json spaces", 2);
 // User router
 app.use("/users", userRouter);
 
-const indexRaw = readFileSync("./data/search-index.json");
-const index = JSON.parse(indexRaw.toString());
-
-index.forEach((p: any) => {
-    app.get(`/pokemon/${p.name}`, (req, res) => {
-        res.json(p);
-    });
-});
-
-app.get("/search", (req, res) => {
+app.get("/search", async (req, res) => {
     const searchQuery = req.query.q as string;
     if (!searchQuery) {
-        return res.status(400).json({ error: "Missing search query" });
+        return getError(res, 400)("Missing search query");
+    }
+    const accessToken = req.query.accessToken as string;
+    const user = accessToken ? await getUserThroughToken(accessToken) : null;
+
+    const indexRaw = await readFile("./data/search-index.json");
+    if (!indexRaw) {
+        return getError(res, 500)("Failed to read search index");
     }
 
-    const indexRaw = readFileSync("./data/search-index.json");
-    const index = JSON.parse(indexRaw.toString());
+    let index = JSON.parse(indexRaw.toString());
+    index = index.map((p: any) => {
+        return { ...p, isCustomPokemon: false, isPartial: true };
+    });
+
+    if (user) {
+        const customPokemon: {
+            name: string;
+            sprites: {
+                front_default: string;
+            };
+            isCustomPokemon: boolean;
+            isPartial: boolean;
+        }[] = user.customPokemon.map((p) => {
+            return {
+                name: p.name,
+                sprites: { front_default: p.sprites.front_default },
+                isCustomPokemon: true,
+                isPartial: false,
+            };
+        });
+        index.push(...customPokemon);
+    }
+
     const results = index.filter((p: any) =>
         p.name.includes(searchQuery.toLowerCase())
     );

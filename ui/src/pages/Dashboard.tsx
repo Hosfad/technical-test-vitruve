@@ -1,12 +1,9 @@
-import React from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { Redirect, useHistory } from "react-router";
-import LoginForm from "../components/LoginForm";
 import { css } from "../../styled-system/css";
-import { User } from "../types";
-import { center } from "../../styled-system/patterns";
-import { markAsFavorite } from "../utils";
 import Layout from "../components/Layout";
+import LoginForm from "../components/LoginForm";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { User } from "../types";
+import { markAsFavorite } from "../utils";
 
 function Dashboard() {
     const [cachedUser, setCachedUser] = useLocalStorage<User | null>(
@@ -73,6 +70,24 @@ function Dashboard() {
                     </div>
                 </div>
             )}
+
+            <button
+                onClick={() => {
+                    window.location.href = "/";
+                }}
+                className={css({
+                    padding: 2,
+                    backgroundColor: "yellow.300",
+                    color: "black",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                    width: "50%",
+                    height: "40px",
+                })}
+            >
+                Pokemon index
+            </button>
 
             <button
                 onClick={() => {

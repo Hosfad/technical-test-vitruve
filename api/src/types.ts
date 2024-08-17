@@ -1,6 +1,7 @@
 export type Pokemon = {
     id: number;
     isCustomPokemon: boolean;
+    isPartial?: boolean;
 
     name: string;
 
