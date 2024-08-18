@@ -89,9 +89,9 @@ app.get("/search", async (req, res) => {
 
     res.json({ results });
 });
-
-app.listen(process.env.PORT || 3000, async () => {
-    console.log(`API listening on port ${process.env.PORT}`);
+let port = process.env.PORT || 8081;
+app.listen(port, async () => {
+    console.log(`API listening on port ${port}`);
 });
 
 export {};

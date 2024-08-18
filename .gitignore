@@ -3,5 +3,4 @@ node_modules
 /ui/build
 /api/node_modules
 /api/build
-/api/.env
 /api/data/users
