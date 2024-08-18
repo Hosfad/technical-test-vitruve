@@ -75,7 +75,9 @@ function PokemonList() {
     const [searchQuery, setSearchQuery] = useState<string | undefined>(
         undefined
     );
-    const [currentFilter, setCurrentFilter] = useState<string | undefined>("");
+    const [currentFilter, setCurrentFilter] = useState<string | undefined>(
+        undefined
+    );
 
     useEffect(() => {
         if (
@@ -121,7 +123,6 @@ function PokemonList() {
                     filter,
                     cachedUser?.accessToken || undefined
                 );
-                console.log("results ", results);
                 setCurrentPokemon(results);
                 setIsFetching(false);
                 return;
@@ -142,18 +143,14 @@ function PokemonList() {
 
     function handleFilter(e: React.ChangeEvent<HTMLSelectElement>) {
         const type = e.target.value;
-        if (type === "") {
+        if (type === "" || type === "All Types") {
+            setCurrentFilter(undefined);
             setCurrentPokemon(allPokemon);
+
             return;
         }
         setCurrentFilter(type);
-
-        handleSearch(undefined, type).then(() => {
-            const results = allPokemon.filter((p) =>
-                p.types?.some((t) => t.type.name === type)
-            );
-            setCurrentPokemon(results);
-        });
+        handleSearch(undefined, type);
     }
 
     return (
@@ -237,6 +234,26 @@ function PokemonList() {
                         if (!isP1Favorite && isP2Favorite) return 1;
                         return 0;
                     })
+                    .filter((p) => {
+                        if (searchQuery && !currentFilter) {
+                            return p.name.toLowerCase().includes(searchQuery);
+                        }
+                        if (!searchQuery && currentFilter) {
+                            return p.types?.some(
+                                (t) => t.type.name === currentFilter
+                            );
+                        }
+                        if (searchQuery && currentFilter) {
+                            return (
+                                p.name.toLowerCase().includes(searchQuery) &&
+                                p.types?.some(
+                                    (t) => t.type.name === currentFilter
+                                )
+                            );
+                        }
+
+                        return p;
+                    })
                     .map((p, idx) => {
                         const isPartial = Object.keys(p).length === 3;
                         return (
@@ -252,33 +269,40 @@ function PokemonList() {
                         );
                     })}
 
-                {!searchQuery && !currentFilter && (
-                    <div
-                        ref={loadMoreRef}
-                        className={css({
-                            display: "flex",
-                            justifyContent: "center",
-                            gap: 4,
-                            marginTop: 4,
-                        })}
-                    >
-                        {hasNextPage ? (
-                            isFetchingNextPage ? (
-                                <div>Loading more...</div>
-                            ) : (
-                                <button
-                                    onClick={() => {
-                                        fetchNextPage();
-                                    }}
-                                >
-                                    Load more
-                                </button>
-                            )
+                <div
+                    ref={loadMoreRef}
+                    className={css({
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 4,
+                        marginTop: 4,
+                    })}
+                >
+                    {hasNextPage ? (
+                        isFetchingNextPage ? (
+                            <div>Loading more...</div>
                         ) : (
-                            <></>
-                        )}
-                    </div>
-                )}
+                            <button
+                                onClick={() => {
+                                    if (
+                                        hasNextPage &&
+                                        !isFetchingNextPage &&
+                                        !searchQuery &&
+                                        !currentFilter
+                                    ) {
+                                        fetchNextPage();
+                                    } else {
+                                        alert("No more pokemon to load");
+                                    }
+                                }}
+                            >
+                                Load more
+                            </button>
+                        )
+                    ) : (
+                        <></>
+                    )}
+                </div>
             </div>
         </div>
     );
