@@ -95,10 +95,8 @@ function PokemonList() {
         if (query) setSearchQuery(query);
         if (filter) setCurrentFilter(filter);
         setIsFetching(true);
-        console.log("searching for ", query, filter);
         const results = await runSearch(query, filter, cachedUser?.accessToken);
         setCurrentPokemon(results);
-        console.log(results);
         setIsFetching(false);
     }
 

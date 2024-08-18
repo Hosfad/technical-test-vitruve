@@ -71,7 +71,6 @@ export async function getPokemon(
         data.isPartial = false;
         return data;
     } catch (error) {
-        console.log(name);
         return null;
     }
 }

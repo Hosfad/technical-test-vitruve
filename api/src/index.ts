@@ -27,9 +27,6 @@ app.use("/users", userRouter);
 app.get("/search", async (req, res) => {
     const searchQuery = req.query.q as string;
     const filter = req.query.filter as string;
-
-    console.log(req.query);
-
     if (!searchQuery && !filter) {
         return getError(res, 400)("No search query or filter provided");
     }
@@ -75,8 +72,6 @@ app.get("/search", async (req, res) => {
             }
         } else if (filter && filter !== "undefined") {
             const types = pokemon.types?.map((t) => t.type.name);
-            console.log("types ", types);
-
             if (types?.includes(filter)) {
                 results.push(pokemon);
             }
