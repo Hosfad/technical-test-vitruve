@@ -82,6 +82,15 @@ app.get("/search", async (req, res) => {
             }
         }
     }
+    if (filter && filter !== "undefined") {
+        results = results.filter((p) => {
+            const types = p.types?.map((t) => t.type.name);
+            return types?.includes(filter);
+        });
+    }
+    if (searchQuery && searchQuery !== "undefined") {
+        results = results.filter((p) => p.name?.includes(searchQuery));
+    }
 
     console.log(
         `Search for q ${searchQuery}, filter ${filter} returned ${results.length} results`

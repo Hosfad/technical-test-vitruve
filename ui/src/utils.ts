@@ -83,9 +83,9 @@ export async function runSearch(
 ): Promise<Pokemon[]> {
     const baseUrl = `${
         import.meta.env.VITE_API_URL
-    }/search?q=${query}&filter=${filter}`;
-    const url = accessToken ? `${baseUrl}&accessToken=${accessToken}` : baseUrl;
-    const response = await fetch(url);
+    }/search?q=${query}&filter=${filter}&accessToken=${accessToken}`;
+
+    const response = await fetch(baseUrl);
 
     if (response.ok) {
         const data = await response.json();

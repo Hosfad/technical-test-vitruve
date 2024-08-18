@@ -92,53 +92,14 @@ function PokemonList() {
     }, [isInView, hasNextPage, isFetching, setIsFetching, fetchNextPage]);
 
     async function handleSearch(query?: string, filter?: string) {
-        setSearchQuery(query);
-        if (query && query.length >= 1) {
-            // Handle online search
-            if (navigator.onLine) {
-                setIsFetching(true);
-                const results: Pokemon[] = await runSearch(
-                    query,
-
-                    undefined,
-                    cachedUser?.accessToken || undefined
-                );
-
-                setCurrentPokemon(results);
-                setIsFetching(false);
-                return;
-            }
-            // Handle offline search (Covers only pokemon that are loaded)
-            const cachedData = await get("pokemon");
-            const results = cachedData.filter((p: { name: string }) =>
-                p.name.toLowerCase().includes(query.toLowerCase())
-            );
-            setCurrentPokemon(results);
-        } else if (filter && filter !== "All Types") {
-            setCurrentFilter(filter);
-            if (navigator.onLine) {
-                setIsFetching(true);
-                const results = await runSearch(
-                    undefined,
-                    filter,
-                    cachedUser?.accessToken || undefined
-                );
-                setCurrentPokemon(results);
-                setIsFetching(false);
-                return;
-            }
-            // Handle offline search (Covers only pokemon that are loaded)
-            const cachedData = await get("pokemon");
-            const results = cachedData.filter((p: Partial<Pokemon>) =>
-                p.types?.some(
-                    (t: { type: { name: string } }) =>
-                        t.type.name === currentFilter
-                )
-            );
-            setCurrentPokemon(results);
-        } else {
-            setCurrentPokemon(allPokemon);
-        }
+        if (query) setSearchQuery(query);
+        if (filter) setCurrentFilter(filter);
+        setIsFetching(true);
+        console.log("searching for ", query, filter);
+        const results = await runSearch(query, filter, cachedUser?.accessToken);
+        setCurrentPokemon(results);
+        console.log(results);
+        setIsFetching(false);
     }
 
     function handleFilter(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -235,24 +196,22 @@ function PokemonList() {
                         return 0;
                     })
                     .filter((p) => {
-                        if (searchQuery && !currentFilter) {
-                            return p.name.toLowerCase().includes(searchQuery);
-                        }
-                        if (!searchQuery && currentFilter) {
-                            return p.types?.some(
-                                (t) => t.type.name === currentFilter
-                            );
-                        }
-                        if (searchQuery && currentFilter) {
+                        if (currentFilter && !searchQuery) {
+                            const types = p.types?.map(
+                                (t) => t.type.name
+                            ) as string[];
+                            return types.includes(currentFilter);
+                        } else if (searchQuery && !currentFilter) {
+                            return p.name.includes(searchQuery);
+                        } else if (searchQuery && currentFilter) {
                             return (
-                                p.name.toLowerCase().includes(searchQuery) &&
+                                p.name.includes(searchQuery) &&
                                 p.types?.some(
                                     (t) => t.type.name === currentFilter
                                 )
                             );
                         }
-
-                        return p;
+                        return true;
                     })
                     .map((p, idx) => {
                         const isPartial = Object.keys(p).length === 3;
