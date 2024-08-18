@@ -89,7 +89,7 @@ app.get("/search", async (req, res) => {
 
     res.json({ results });
 });
-let port = process.env.PORT || 8081;
+let port = process.env.PORT || 8089;
 app.listen(port, async () => {
     console.log(`API listening on port ${port}`);
 });

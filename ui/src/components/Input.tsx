@@ -7,12 +7,14 @@ function Input({
     defaultValue,
     placeholder,
     required,
+    step,
     onChange,
 }: {
     type: "text" | "email" | "password" | "number";
     name: string;
     defaultValue?: string | number;
     placeholder?: string;
+    step?: string;
     required?: boolean;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
@@ -35,7 +37,9 @@ function Input({
             type={type}
             required={required}
             onChange={onChange}
-            step={type === "number" ? "0.01" : undefined}
+            step={type === "number" && step ? step : undefined}
+            pattern={type === "number" ? "[0-9]*" : undefined}
+            inputMode={type === "number" ? "numeric" : undefined}
         ></input>
     );
 }

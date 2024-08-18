@@ -2,6 +2,8 @@
 
 -   Vitruve technical interview
 
+-   **Note:** for creating custom pokemon i limited the image to 1mb, instead of having to look for an image, here is an example image you can use [Pokémon_Pikachu_art.png](https://upload.wikimedia.org/wikipedia/en/a/a6/Pok%C3%A9mon_Pikachu_art.png)
+
 ## Install dependencies
 
 -   While inside the main dir (technical-test-vitruve) run `npm install` it will install the dependencies for both ui and api.

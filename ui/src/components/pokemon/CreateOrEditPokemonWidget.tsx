@@ -146,6 +146,7 @@ function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
                             type="number"
                             name="height"
                             placeholder="Height"
+                            step="1"
                             defaultValue={currentPokemon?.height || ""}
                         ></Input>
                     </div>
@@ -165,7 +166,7 @@ function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
                     </div>
 
                     <div>
-                        <h1>Image</h1>
+                        <h1>Image {image && <span>✔️</span>}</h1>
 
                         <button
                             className={css({
