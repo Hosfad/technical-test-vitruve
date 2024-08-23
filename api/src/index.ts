@@ -41,7 +41,6 @@ app.get("/search", async (req, res) => {
         return failedToReadIndex("Failed to read search index");
     }
 
-    /**@todo surround with try catch */
     let index: Partial<Pokemon>[];
     try {
         index = JSON.parse(indexRaw.toString());

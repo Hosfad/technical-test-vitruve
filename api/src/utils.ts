@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { Response } from "express";
 import { existsSync, mkdir } from "fs";
 import { readdir, readFile, writeFile } from "fs/promises";
@@ -50,10 +51,31 @@ export async function saveUser(user: User) {
     return user;
 }
 
+export async function hashPassword(
+    password: string,
+    salt: string
+): Promise<string> {
+    const hashedPasswordBuffer = await crypto.pbkdf2Sync(
+        password,
+        salt,
+        1000,
+        64,
+        "sha256"
+    );
+
+    const hashedPassword = getStringFromBuffer(hashedPasswordBuffer);
+
+    return hashedPassword;
+}
+export const getStringFromBuffer = (buffer: ArrayBuffer) =>
+    Array.from(new Uint8Array(buffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
 export const parseUserForResponse = async (user: User) => {
     await saveUser(user);
-    //@ts-ignore
     delete user.password;
+    delete user.salt;
     return user;
 };
 

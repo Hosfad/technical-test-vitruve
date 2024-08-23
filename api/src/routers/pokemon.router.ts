@@ -1,5 +1,5 @@
 import e, { Request, Response } from "express";
-import { readFileSync } from "fs";
+import { readFile } from "fs/promises";
 import { AuthenticatedRequest, Pokemon, PokemonData } from "../types";
 import { getError, parseUserForResponse } from "../utils";
 
@@ -12,7 +12,9 @@ pokemonRouter.get("/favorite/:pokemon", async (req: Request, res: Response) => {
     const user = authenticatedReq.user;
 
     const includes = user.favorites.find((p) => p.name === pokemon);
-    const searchIndex = readFileSync("./data/search-index.json");
+
+    const searchIndex = await readFile("./data/search-index.json");
+
     const index = JSON.parse(searchIndex.toString());
     const desiredPokemon = index.find((p: PokemonData) => p.name === pokemon);
     const notFound = getError(res, 404);
@@ -59,6 +61,7 @@ pokemonRouter.put("/", async (req: Request, res: Response) => {
             },
         ],
     };
+
     user.customPokemon.push(pokemon);
     res.json({ user: await parseUserForResponse(user), pokemon: pokemon });
 });

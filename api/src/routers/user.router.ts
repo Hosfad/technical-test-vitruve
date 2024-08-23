@@ -1,7 +1,13 @@
 import e, { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
 import authenticateUser from "../middleware/authenticateUser";
 import { User } from "../types";
-import { getError, getUserInfo, parseUserForResponse } from "../utils";
+import {
+    getError,
+    getUserInfo,
+    hashPassword,
+    parseUserForResponse,
+} from "../utils";
 import pokemonRouter from "./pokemon.router";
 
 const userRouter = e.Router();
@@ -35,17 +41,18 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
         return badRequest("User already exists");
     }
 
-    const accessToken = Math.random().toString(36) + Math.random().toString(36);
+    const accessToken = uuidv4();
+    const salt = uuidv4();
 
-    // In a real world we would hash the password before saving it but for the sake of this test we are gonna save it as is :P
-    // we will also have an expiration date for the accessToken but for this test thats not needed.
+    // In a real world we would have an expiration date for the accessToken but for this test thats not needed.
     const user: User = {
         email,
-        password,
+        password: await hashPassword(password, salt),
         username,
         favorites: [],
         customPokemon: [],
         accessToken,
+        salt,
     };
 
     res.json(await parseUserForResponse(user));
@@ -57,10 +64,15 @@ userRouter.post("/login", async (req: Request, res: Response) => {
     if (!email || !password) {
         return getError(res, 400)("Missing required fields");
     }
+    const notAuthorized = getError(res, 401);
 
     const user = await getUserInfo(email);
-    if (!user || user.password !== password) {
-        return getError(res, 401)("Invalid email or password");
+    if (!user) return notAuthorized("User not found");
+
+    const hashedPassword = await hashPassword(password, user.salt!);
+
+    if (user.password !== hashedPassword) {
+        return notAuthorized("Incorrect password");
     }
 
     res.json(await parseUserForResponse(user));

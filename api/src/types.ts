@@ -34,7 +34,8 @@ export type PokemonStats = {
 export type User = {
     username: string;
     email: string;
-    password: string;
+    password?: string;
+    salt?: string;
     favorites: {
         name: string;
         sprites: {

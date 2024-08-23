@@ -2,6 +2,7 @@ import {
     IonApp,
     IonButton,
     IonHeader,
+    IonRouterLink,
     IonRouterOutlet,
     IonTitle,
     IonToolbar,
@@ -97,14 +98,14 @@ const App: React.FC = () => {
                             justifyContent: "space-between",
                         })}
                     >
-                        <a href="/">
+                        <IonRouterLink href="/">
                             <IonTitle>Pokédex App</IonTitle>
-                        </a>
-                        <a href="/dashboard">
+                        </IonRouterLink>
+                        <IonRouterLink href="/dashboard">
                             <IonButton>
                                 {cachedUser ? "Dashboard" : "Login"}
                             </IonButton>
-                        </a>
+                        </IonRouterLink>
                     </div>
                 </IonToolbar>
             </IonHeader>
