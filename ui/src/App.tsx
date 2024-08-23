@@ -57,6 +57,7 @@ const App: React.FC = () => {
         "user",
         null
     );
+
     const [lastRefresh, setLastRefresh] = useLocalStorage<number>(
         "lastRefresh",
         0

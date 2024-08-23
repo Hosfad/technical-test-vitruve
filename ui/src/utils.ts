@@ -60,7 +60,9 @@ export async function markAsFavorite(
     accessToken: string,
     pokemon: string
 ): Promise<User | null> {
-    const url = `${import.meta.env.VITE_API_URL}/users/@me/favorite/${pokemon}`;
+    const url = `${
+        import.meta.env.VITE_API_URL
+    }/users/pokemon/favorite/${pokemon}`;
 
     const response = await fetch(url, {
         method: "GET",

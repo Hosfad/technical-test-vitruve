@@ -92,8 +92,24 @@ function PokemonList() {
     }, [isInView, hasNextPage, isFetching, setIsFetching, fetchNextPage]);
 
     async function handleSearch(query?: string, filter?: string) {
+        // Handle offline search
+        if (!navigator.onLine) {
+            const all = allPokemon.filter((p) => {
+                const matchesName = query
+                    ? p.name.toLowerCase().includes(query.toLowerCase())
+                    : true;
+                const matchesType = filter
+                    ? p.types?.some((t) => t.type.name === filter)
+                    : true;
+                return matchesName && matchesType;
+            });
+            setCurrentPokemon(all);
+            return;
+        }
+
         if (query) setSearchQuery(query);
         if (filter) setCurrentFilter(filter);
+
         setIsFetching(true);
         const results = await runSearch(query, filter, cachedUser?.accessToken);
         setCurrentPokemon(results);
@@ -102,14 +118,15 @@ function PokemonList() {
 
     function handleFilter(e: React.ChangeEvent<HTMLSelectElement>) {
         const type = e.target.value;
-        if (type === "" || type === "All Types") {
+        if (type === "") {
             setCurrentFilter(undefined);
             setCurrentPokemon(allPokemon);
-
             return;
         }
-        setCurrentFilter(type);
-        handleSearch(undefined, type);
+        const finalType = type === "All Types" ? undefined : type;
+
+        setCurrentFilter(finalType);
+        handleSearch(searchQuery, finalType);
     }
 
     return (
@@ -146,7 +163,9 @@ function PokemonList() {
                         borderRadius: 4,
                     })}
                     placeholder="Search pokemon"
-                    onChange={(e) => handleSearch(e.target.value)}
+                    onChange={(e) =>
+                        handleSearch(e.target.value, currentFilter)
+                    }
                     onTouchStart={(e) => e.stopPropagation()}
                     onTouchEnd={(e) => e.stopPropagation()}
                 ></input>
@@ -192,24 +211,6 @@ function PokemonList() {
                         if (isP1Favorite && !isP2Favorite) return -1;
                         if (!isP1Favorite && isP2Favorite) return 1;
                         return 0;
-                    })
-                    .filter((p) => {
-                        if (currentFilter && !searchQuery) {
-                            const types = p.types?.map(
-                                (t) => t.type.name
-                            ) as string[];
-                            return types.includes(currentFilter);
-                        } else if (searchQuery && !currentFilter) {
-                            return p.name.includes(searchQuery);
-                        } else if (searchQuery && currentFilter) {
-                            return (
-                                p.name.includes(searchQuery) &&
-                                p.types?.some(
-                                    (t) => t.type.name === currentFilter
-                                )
-                            );
-                        }
-                        return true;
                     })
                     .map((p, idx) => {
                         const isPartial = Object.keys(p).length === 3;

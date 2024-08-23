@@ -1,24 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
+
+import { get, set } from "idb-keyval";
 
 export const useLocalStorage = <T>(
-  key: string,
-  initialValue: T
+    key: string,
+    initialValue: T
 ): [T, (value: T) => void] => {
-  const [storedValue, setStoredValue] = useState(initialValue)
+    const [storedValue, setStoredValue] = useState(initialValue);
 
-  useEffect(() => {
-    // Retrieve from localStorage
-    const item = window.localStorage.getItem(key)
-    if (item && item !== 'undefined') {
-      setStoredValue(JSON.parse(item))
-    }
-  }, [key])
+    useEffect(() => {
+        // Retrieve from IndexedDB
+        const fetchValue = async () => {
+            const item = await get(key);
+            if (item !== undefined) {
+                setStoredValue(item);
+            }
+        };
 
-  const setValue = (value: T) => {
-    // Save state
-    setStoredValue(value)
-    // Save to localStorage
-    window.localStorage.setItem(key, JSON.stringify(value))
-  }
-  return [storedValue, setValue]
-}
+        fetchValue();
+    }, [key]);
+
+    const setValue = async (value: T) => {
+        setStoredValue(value);
+        await set(key, value);
+    };
+
+    return [storedValue, setValue];
+};

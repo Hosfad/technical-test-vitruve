@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export type Pokemon = {
     id: number;
     isCustomPokemon: boolean;
@@ -41,4 +43,8 @@ export type User = {
     }[];
     accessToken?: string;
     customPokemon: Pokemon[];
+};
+
+export type AuthenticatedRequest = Request & {
+    user: User;
 };

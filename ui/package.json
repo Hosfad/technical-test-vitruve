@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "6.1.2",
-    "@pandacss/dev": "^0.45.0",
+    "@pandacss/dev": "^0.45.1",
     "@testing-library/dom": ">=7.21.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",

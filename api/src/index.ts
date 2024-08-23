@@ -5,8 +5,8 @@ import { readFile } from "fs/promises";
 import userRouter from "./routers/user.router";
 import { Pokemon } from "./types";
 import { getError, getUserThroughToken } from "./utils";
-dotenv.config();
 
+dotenv.config();
 const app = express();
 
 app.use(
@@ -45,14 +45,7 @@ app.get("/search", async (req, res) => {
     });
 
     if (user) {
-        const customPokemon: {
-            name: string;
-            sprites: {
-                front_default: string;
-            };
-            isCustomPokemon: boolean;
-            isPartial: boolean;
-        }[] = user.customPokemon.map((p) => {
+        const customPokemon = user.customPokemon.map((p) => {
             return {
                 name: p.name,
                 sprites: { front_default: p.sprites.front_default },
@@ -63,20 +56,8 @@ app.get("/search", async (req, res) => {
         index.push(...customPokemon);
     }
 
-    let results: Partial<Pokemon>[] = [];
+    let results: Partial<Pokemon>[] = index;
 
-    for (const pokemon of index) {
-        if (searchQuery && searchQuery !== "undefined") {
-            if (pokemon.name?.includes(searchQuery)) {
-                results.push(pokemon);
-            }
-        } else if (filter && filter !== "undefined") {
-            const types = pokemon.types?.map((t) => t.type.name);
-            if (types?.includes(filter)) {
-                results.push(pokemon);
-            }
-        }
-    }
     if (filter && filter !== "undefined") {
         results = results.filter((p) => {
             const types = p.types?.map((t) => t.type.name);

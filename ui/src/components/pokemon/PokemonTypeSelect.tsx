@@ -28,7 +28,7 @@ function PokemonTypeSelect({
                         backgroundColor: "black",
                         color: "yellow.300",
                     }}
-                    value=""
+                    value={undefined}
                 >
                     All Types
                 </option>
