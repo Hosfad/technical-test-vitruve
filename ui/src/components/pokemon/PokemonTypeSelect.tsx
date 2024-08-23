@@ -1,6 +1,6 @@
 import { ChangeEventHandler } from "react";
 import { css } from "../../../styled-system/css";
-import { getAllTypes } from "../../utils";
+import { getAllPokemonTypes } from "../../utils";
 
 function PokemonTypeSelect({
     incdludeAllTypes,
@@ -33,7 +33,8 @@ function PokemonTypeSelect({
                     All Types
                 </option>
             )}
-            {getAllTypes().map((type, idx) => {
+
+            {getAllPokemonTypes().map((type, idx) => {
                 return (
                     <option
                         key={type + "-" + idx}

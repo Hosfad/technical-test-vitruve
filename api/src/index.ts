@@ -35,15 +35,25 @@ app.get("/search", async (req, res) => {
     const user = accessToken ? await getUserThroughToken(accessToken) : null;
 
     const indexRaw = await readFile("./data/search-index.json");
+
+    const failedToReadIndex = getError(res, 500);
     if (!indexRaw) {
-        return getError(res, 500)("Failed to read search index");
+        return failedToReadIndex("Failed to read search index");
     }
 
-    let index: Partial<Pokemon>[] = JSON.parse(indexRaw.toString());
+    /**@todo surround with try catch */
+    let index: Partial<Pokemon>[];
+    try {
+        index = JSON.parse(indexRaw.toString());
+    } catch (e) {
+        return failedToReadIndex("Failed to parse index json");
+    }
+
     index = index.map((p: Partial<Pokemon>) => {
         return { ...p, isCustomPokemon: false, isPartial: true };
     });
 
+    // Add custom pokemon to the search index if a user is authenticated
     if (user) {
         const customPokemon = user.customPokemon.map((p) => {
             return {

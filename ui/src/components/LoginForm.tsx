@@ -50,7 +50,7 @@ function LoginForm() {
     return (
         <Layout>
             <h1 className={css({ color: "yellow.300" })}>
-                Login to you'r pokedex account
+                Login to your pokedex account
             </h1>
 
             {errMessage && (

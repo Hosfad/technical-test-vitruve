@@ -108,6 +108,7 @@ function CreateOrEditPokemonWidget({ pokemon }: { pokemon?: Pokemon }) {
                     border: "1px solid",
                     borderColor: "yellow.300",
                     cursor: "pointer",
+                    minHeight: 20,
                 })}
                 whileHover={{ scale: 1.1 }}
                 onClick={() =>

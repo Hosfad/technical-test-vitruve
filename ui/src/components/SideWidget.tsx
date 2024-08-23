@@ -49,7 +49,6 @@ function SideWidget({
         zIndex: 999,
         padding: "20px",
         overflowY: "auto",
-        // hide scrollbar
         "&::-webkit-scrollbar": {
             display: "none",
         },

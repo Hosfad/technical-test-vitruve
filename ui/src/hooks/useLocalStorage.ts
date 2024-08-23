@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-
 import { get, set } from "idb-keyval";
+import { useEffect, useState } from "react";
 
 export const useLocalStorage = <T>(
     key: string,
@@ -9,7 +8,7 @@ export const useLocalStorage = <T>(
     const [storedValue, setStoredValue] = useState(initialValue);
 
     useEffect(() => {
-        // Retrieve from IndexedDB
+        // Retrieve from Indexed DB
         const fetchValue = async () => {
             const item = await get(key);
             if (item !== undefined) {

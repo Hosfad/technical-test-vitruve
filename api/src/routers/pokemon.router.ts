@@ -1,14 +1,9 @@
 import e, { Request, Response } from "express";
 import { readFileSync } from "fs";
-import authenticateUser from "../middleware/authenticateUser";
 import { AuthenticatedRequest, Pokemon, PokemonData } from "../types";
 import { getError, parseUserForResponse } from "../utils";
 
 const pokemonRouter = e.Router({ mergeParams: true });
-
-// since all the endpoints here need authentication, we could just call router.use(authenticateUser) and it will apply for all endpoints
-
-pokemonRouter.use(authenticateUser);
 
 // Mark favorate
 pokemonRouter.get("/favorite/:pokemon", async (req: Request, res: Response) => {
@@ -21,6 +16,7 @@ pokemonRouter.get("/favorite/:pokemon", async (req: Request, res: Response) => {
     const index = JSON.parse(searchIndex.toString());
     const desiredPokemon = index.find((p: PokemonData) => p.name === pokemon);
     const notFound = getError(res, 404);
+
     if (!desiredPokemon) {
         return notFound("Pokemon not found");
     }
@@ -67,19 +63,6 @@ pokemonRouter.put("/", async (req: Request, res: Response) => {
     res.json({ user: await parseUserForResponse(user), pokemon: pokemon });
 });
 
-// Delete pokemon
-pokemonRouter.delete("/:id", async (req: Request, res: Response) => {
-    const authenticatedReq = req as AuthenticatedRequest;
-    const { id } = req.params;
-    const user = authenticatedReq.user;
-    if (!user.customPokemon) user.customPokemon = [];
-    user.customPokemon = user.customPokemon.filter(
-        (p) => p.id !== parseInt(id)
-    );
-
-    res.json(await parseUserForResponse(user));
-});
-
 // Change existing pokemon
 pokemonRouter.post("/:id", async (req: Request, res: Response) => {
     const authenticatedReq = req as AuthenticatedRequest;
@@ -93,15 +76,9 @@ pokemonRouter.post("/:id", async (req: Request, res: Response) => {
 
     const { height, weight, name, types, image } = req.body;
 
-    if (height) {
-        pokemon.height = height;
-    }
-    if (weight) {
-        pokemon.weight = weight;
-    }
-    if (name) {
-        pokemon.name = name;
-    }
+    pokemon.height = height ?? pokemon.height;
+    pokemon.weight = weight ?? pokemon.weight;
+    pokemon.name = name ?? pokemon.name;
     if (types) {
         pokemon.types = [
             {
@@ -112,11 +89,22 @@ pokemonRouter.post("/:id", async (req: Request, res: Response) => {
             },
         ];
     }
-    if (image) {
-        pokemon.sprites.front_default = image;
-    }
+    pokemon.sprites.front_default = image ?? pokemon.sprites.front_default;
 
     res.json({ user: await parseUserForResponse(user), pokemon: pokemon });
+});
+
+// Delete pokemon
+pokemonRouter.delete("/:id", async (req: Request, res: Response) => {
+    const authenticatedReq = req as AuthenticatedRequest;
+    const { id } = req.params;
+    const user = authenticatedReq.user;
+    if (!user.customPokemon) user.customPokemon = [];
+    user.customPokemon = user.customPokemon.filter(
+        (p) => p.id !== parseInt(id)
+    );
+
+    res.json(await parseUserForResponse(user));
 });
 
 export default pokemonRouter;

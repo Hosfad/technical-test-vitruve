@@ -4,6 +4,7 @@ import { readdir, readFile, writeFile } from "fs/promises";
 import { User } from "./types";
 
 const usersDir = "./data/users";
+// This is sync to make sure dir exists b4 reading/righting to it
 if (!existsSync(usersDir)) {
     mkdir(usersDir, { recursive: true }, (err) => {
         if (err) throw err;
@@ -32,6 +33,7 @@ export async function getAllUsers(): Promise<User[]> {
     }
     return all;
 }
+
 export async function getUserThroughToken(token: string): Promise<User | null> {
     const all = await getAllUsers();
 

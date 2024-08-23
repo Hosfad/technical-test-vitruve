@@ -20,6 +20,7 @@ const PokemonCard = ({
         null
     );
     const [isOpen, setOpen] = useState(false);
+
     const [cachedUser, setCachedUser] = useLocalStorage<User | null>(
         "user",
         null

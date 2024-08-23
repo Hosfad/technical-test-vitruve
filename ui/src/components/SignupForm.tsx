@@ -18,8 +18,9 @@ function SingupForm() {
             username: { value: username },
         } = e.currentTarget;
 
-        if (!email || !password || !username)
+        if (!email || !password || !username) {
             return alert("All fields are required");
+        }
 
         const res = await fetch(
             `${import.meta.env.VITE_API_URL}/users/signup`,

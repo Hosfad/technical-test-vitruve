@@ -10,7 +10,8 @@ type AuthenticatedRequest = Request & {
     user: User;
 };
 
-userRouter.use("/pokemon", pokemonRouter);
+// Apply authenticateUser on all enpoints of the pokemonRouter
+userRouter.use("/pokemon", authenticateUser, pokemonRouter);
 
 userRouter.get(
     "/@me",

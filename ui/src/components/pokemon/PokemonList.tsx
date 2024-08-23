@@ -8,6 +8,7 @@ import PokemonCard from "./PokemonCard";
 
 import { del, get, set } from "idb-keyval";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import Input from "../Input";
 import CreateOrEditPokemonWidget from "./CreateOrEditPokemonWidget";
 import PokemonTypeSelect from "./PokemonTypeSelect";
 
@@ -151,24 +152,14 @@ function PokemonList() {
                     },
                 })}
             >
-                <input
-                    className={css({
-                        padding: 4,
-                        width: "100%",
-                        border: "1px solid ",
-                        borderColor: "yellow.300",
-                        _placeholder: {
-                            color: "yellow.300",
-                        },
-                        borderRadius: 4,
-                    })}
+                <Input
+                    type="text"
+                    name="search-bar"
                     placeholder="Search pokemon"
                     onChange={(e) =>
                         handleSearch(e.target.value, currentFilter)
                     }
-                    onTouchStart={(e) => e.stopPropagation()}
-                    onTouchEnd={(e) => e.stopPropagation()}
-                ></input>
+                ></Input>
 
                 <PokemonTypeSelect
                     incdludeAllTypes
@@ -185,8 +176,10 @@ function PokemonList() {
                     color: "yellow.300",
                 })}
             >
+                {/** Create pokemon */}
                 <CreateOrEditPokemonWidget />
 
+                {/** Custom pokemon */}
                 {!searchQuery &&
                     !currentFilter &&
                     customPokemon.map((p, idx) => (
@@ -199,6 +192,7 @@ function PokemonList() {
                         </div>
                     ))}
 
+                {/** PokeAPI pokemon */}
                 {currentPokemon
                     .sort((p1, p2) => {
                         const isP1Favorite = cachedUser?.favorites.find(
