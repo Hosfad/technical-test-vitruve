@@ -20,7 +20,6 @@ export async function getUserInfo(email: string): Promise<User | null> {
 
         return JSON.parse(data);
     } catch (error) {
-        console.error(error);
         return null;
     }
 }
