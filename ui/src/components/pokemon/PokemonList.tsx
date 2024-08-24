@@ -6,7 +6,7 @@ import { Pokemon, User } from "../../types";
 import { getAllPokemon, runSearch } from "../../utils";
 import PokemonCard from "./PokemonCard";
 
-import { del, get, set } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import Input from "../Input";
 import CreateOrEditPokemonWidget from "./CreateOrEditPokemonWidget";
@@ -33,7 +33,6 @@ function PokemonList() {
     } = useInfiniteQuery({
         queryKey: ["pokemon"],
         queryFn: async ({ pageParam = 1 }) => {
-            await del("pokemon");
             const cachedData = await get("pokemon");
             if (
                 cachedData &&
