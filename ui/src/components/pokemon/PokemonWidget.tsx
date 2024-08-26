@@ -64,6 +64,7 @@ function PokemonWidget({
                     alignItems: "center",
                     justifyContent: "space-between",
                 })}
+                id="pokemon-widget"
             >
                 <img
                     src={pokemon.sprites?.front_default}

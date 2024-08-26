@@ -94,6 +94,7 @@ function Dashboard() {
                     setCachedUser(null);
                     window.location.reload();
                 }}
+                id="logout-button"
                 className={css({
                     padding: 2,
                     backgroundColor: "red",

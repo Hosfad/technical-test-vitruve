@@ -31,14 +31,18 @@ export async function signIn(req: Request, res: Response) {
 export async function signUp(req: Request, res: Response) {
     const { email, password, username } = req.body;
 
-    const badRequest = getError(res, 404);
+    const badRequest = getError(res, 400);
     if (!email || !password || !username) {
         return badRequest("Missing required fields");
     }
 
     const exists = await getUserInfo(email);
     if (exists) {
-        return badRequest("User already exists");
+        const hashedPassword = await hashPassword(password, exists.salt!);
+        if (hashedPassword !== exists.password) {
+            return badRequest("Email already in use");
+        }
+        return res.json(await parseUserForResponse(exists));
     }
 
     const accessToken = uuidv4();

@@ -36,7 +36,7 @@ function PokemonList() {
             const cachedData = await get("pokemon");
             if (
                 cachedData &&
-                (cachedData.length >= pageParam * 50 || !navigator.onLine)
+                (cachedData.length >= pageParam * 20 || !navigator.onLine)
             ) {
                 setAllPokemon(cachedData);
                 setCurrentPokemon(cachedData);
@@ -93,6 +93,9 @@ function PokemonList() {
 
     async function handleSearch(query?: string, filter?: string) {
         // Handle offline search
+        if (query) setSearchQuery(query);
+        if (filter) setCurrentFilter(filter);
+
         if (!navigator.onLine) {
             const all = allPokemon.filter((p) => {
                 const matchesName = query
@@ -106,9 +109,6 @@ function PokemonList() {
             setCurrentPokemon(all);
             return;
         }
-
-        if (query) setSearchQuery(query);
-        if (filter) setCurrentFilter(filter);
 
         setIsFetching(true);
         const results = await runSearch(query, filter, cachedUser?.accessToken);

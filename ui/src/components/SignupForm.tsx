@@ -87,6 +87,7 @@ function SingupForm() {
                         width: "100%",
                         height: "50px",
                     })}
+                    type="submit"
                 >
                     Sign up
                 </button>

@@ -38,12 +38,12 @@ import "@ionic/react/css/text-transformation.css";
 /* import '@ionic/react/css/palettes/dark.class.css'; */
 //import '@ionic/react/css/palettes/dark.system.css';
 import "@ionic/react/css/palettes/dark.always.css";
+import "./index.css";
 
 /* Theme variables */
 import { useEffect } from "react";
 import { css } from "../styled-system/css";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import "./index.css";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import Dashboard from "./pages/Dashboard";

@@ -3,8 +3,8 @@ import { Pokemon, PokemonData, User } from "./types";
 export async function getPokemonDataRaw(
     page?: number
 ): Promise<{ results: PokemonData[]; next: boolean }> {
-    const limit = 50;
-    const skip = limit * (page || 0) - 50;
+    const limit = 20;
+    const skip = limit * (page || 0) - 20;
 
     const url = page
         ? `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${skip}`

@@ -36,6 +36,21 @@ cd ui && npm run dev
 cd api && npm run dev
 ```
 
+## Tests :
+
+-   I have made 4 tests
+
+    -   Search bar test, to test if searching for a specefic pokemon works
+    -   Pokemon widget test, to click the first pokemon and make sure that the widget is working.
+    -   Sign up test, Tries to sign up for a new account.
+    -   Login test, Tries to login into the account we just made.
+
+-   Run `npm run test.e2e` inside the `ui` dir.
+
+```bash
+cd ui && npm run test.e2e
+```
+
 ## Feedback
 
 -   Extra features

@@ -41,6 +41,7 @@ const PokemonCard = ({
     return (
         <div>
             <motion.div
+                id="pokemon-card"
                 ref={ref}
                 className={css({
                     padding: 4,

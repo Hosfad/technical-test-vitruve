@@ -77,6 +77,8 @@ app.get("/search", async (req, res) => {
         results = results.filter((p) => p.name?.includes(searchQuery));
     }
 
+    console.log(`Returning ${results.length} results`);
+
     res.json({ results });
 });
 let port = process.env.PORT || 8081;

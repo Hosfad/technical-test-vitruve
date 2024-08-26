@@ -8,6 +8,7 @@
     "dev": "concurrently \"npm run dev --prefix api\" \"npm run dev --prefix ui\""
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/node": "^17.0.36",
     "eslint": "^8.16.0",
     "eslint-config-google": "^0.14.0",

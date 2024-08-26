@@ -86,6 +86,7 @@ function LoginForm() {
                         width: "100%",
                         height: "50px",
                     })}
+                    type="submit"
                 >
                     Login
                 </button>
