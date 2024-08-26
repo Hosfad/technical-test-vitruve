@@ -77,7 +77,7 @@ app.get("/search", async (req, res) => {
         results = results.filter((p) => p.name?.includes(searchQuery));
     }
 
-    console.log(`Returning ${results.length} results`);
+    console.log(`Returning ${results.length} results`, searchQuery, filter);
 
     res.json({ results });
 });

@@ -65,7 +65,6 @@ const App: React.FC = () => {
     );
 
     // Refresh the user data if the user is online to keep the data up to date
-
     useEffect(() => {
         if (
             cachedUser &&

@@ -49,7 +49,7 @@ function LoginForm() {
 
     return (
         <Layout>
-            <h1 className={css({ color: "yellow.300" })}>
+            <h1 id="login-page-header" className={css({ color: "yellow.300" })}>
                 Login to your pokedex account
             </h1>
 

@@ -1,42 +1,25 @@
 import { motion, useInView } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { css } from "../../../styled-system/css";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { Pokemon, User } from "../../types";
-import { capitalizeFirstLetter, getPokemon } from "../../utils";
+import { capitalizeFirstLetter } from "../../utils";
 import PokemonWidget from "./PokemonWidget";
 
 const PokemonCard = ({
     pokemon,
     isCustomPokemon,
+    cachedUser,
+    setCachedUser,
 }: {
-    pokemon: Pokemon | string;
+    pokemon: Pokemon | Partial<Pokemon>;
     isCustomPokemon?: boolean;
+    cachedUser: User | null;
+    setCachedUser: (user: User | null) => void;
 }) => {
     const ref = React.useRef(null);
     const isInView = useInView(ref, { once: true });
 
-    const [currentPokemon, setCurrentPokemon] = React.useState<Pokemon | null>(
-        null
-    );
     const [isOpen, setOpen] = useState(false);
-
-    const [cachedUser, setCachedUser] = useLocalStorage<User | null>(
-        "user",
-        null
-    );
-
-    useEffect(() => {
-        if (typeof pokemon === "string") {
-            getPokemon(pokemon, isCustomPokemon ? cachedUser! : undefined).then(
-                (data) => {
-                    setCurrentPokemon(data);
-                }
-            );
-        } else {
-            setCurrentPokemon(pokemon);
-        }
-    }, [pokemon]);
 
     return (
         <div>
@@ -68,10 +51,10 @@ const PokemonCard = ({
                         overflow: "hidden",
                     })}
                 >
-                    {currentPokemon?.sprites?.front_default ? (
+                    {pokemon?.sprites?.front_default ? (
                         <img
-                            src={currentPokemon.sprites.front_default}
-                            alt={currentPokemon.name}
+                            src={pokemon.sprites.front_default}
+                            alt={pokemon.name}
                             className={css({
                                 width: "100%",
                                 height: "100%",
@@ -82,16 +65,18 @@ const PokemonCard = ({
                         <p>N/A</p>
                     )}
                 </div>
-                <p>{capitalizeFirstLetter(currentPokemon?.name || "N/A")}</p>
+                <p>{capitalizeFirstLetter(pokemon?.name || "N/A")}</p>
             </motion.div>
 
-            <PokemonWidget
-                pokemon={currentPokemon}
-                isOpen={isOpen}
-                setOpen={setOpen}
-                cachedUser={cachedUser}
-                setCachedUser={setCachedUser}
-            />
+            {isOpen && (
+                <PokemonWidget
+                    pokemon={pokemon}
+                    isOpen={isOpen}
+                    setOpen={setOpen}
+                    cachedUser={cachedUser}
+                    setCachedUser={setCachedUser}
+                />
+            )}
         </div>
     );
 };

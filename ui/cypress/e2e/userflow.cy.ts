@@ -11,6 +11,9 @@ describe("Search bar test", () => {
             timeout: 10000,
             scrollBehavior: false,
         }).should("have.length.greaterThan", 0);
+
+        cy.wait(2000);
+        cy.screenshot("search-bar");
     });
 });
 
@@ -42,8 +45,9 @@ describe("pokemon widget test", () => {
 // SHould maybe run the auth tests twice with 2 different users
 
 // Sign up for an account
-describe("signup test", () => {
-    it("opens the signup page and tries to sign up for an account", () => {
+describe("signup and logout test", () => {
+    it("opens the signup page and tries to sign up for an account, Then signs out", () => {
+        // Sign up
         cy.visit("/signup");
 
         cy.get('input[name="username"]').type("testuser");
@@ -56,22 +60,28 @@ describe("signup test", () => {
 
         cy.wait(2000);
 
+        // Click logout button
         cy.get("#logout-button", {
             timeout: 5000,
             scrollBehavior: false,
         }).should("be.visible");
-        cy.log("logout button found");
-
-        cy.screenshot("signup-success");
 
         cy.get("#logout-button").click();
-        cy.wait(1000);
+
+        // Check if we are logged out
+        cy.get("#login-page-header", {
+            timeout: 5000,
+            scrollBehavior: false,
+        }).should("be.visible");
+        cy.wait(2000);
+
+        cy.screenshot("signup-success");
     });
 });
 
 // Sign into the account we just made
-describe("sign in and logout test", () => {
-    it("opens the sign page and tries to sign in then logs out", () => {
+describe("sign in test", () => {
+    it("opens the sign page and tries to sign in", () => {
         cy.visit("/login");
 
         cy.get('input[name="email"]').type("test@vitruve.fit");
@@ -85,6 +95,7 @@ describe("sign in and logout test", () => {
         }).should("be.visible");
 
         cy.log("logout button found");
+
         cy.screenshot("sign-in-success");
     });
 });

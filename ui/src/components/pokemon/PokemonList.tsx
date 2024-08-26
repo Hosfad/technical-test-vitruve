@@ -110,6 +110,15 @@ function PokemonList() {
             return;
         }
 
+        if (!query) {
+            const all = allPokemon.filter((p) => {
+                const matchesType = filter
+                    ? p.types?.some((t) => t.type.name === filter)
+                    : true;
+                return matchesType;
+            });
+            setCurrentPokemon(all);
+        }
         setIsFetching(true);
         const results = await runSearch(query, filter, cachedUser?.accessToken);
         setCurrentPokemon(results);
@@ -155,9 +164,10 @@ function PokemonList() {
                     type="text"
                     name="search-bar"
                     placeholder="Search pokemon"
-                    onChange={(e) =>
-                        handleSearch(e.target.value, currentFilter)
-                    }
+                    onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        handleSearch(e.target.value, currentFilter);
+                    }}
                 ></Input>
 
                 <PokemonTypeSelect
@@ -187,6 +197,8 @@ function PokemonList() {
                                 key={p.name}
                                 pokemon={p}
                                 isCustomPokemon
+                                cachedUser={cachedUser}
+                                setCachedUser={setCachedUser}
                             />
                         </div>
                     ))}
@@ -206,15 +218,14 @@ function PokemonList() {
                         return 0;
                     })
                     .map((p, idx) => {
-                        const isPartial = Object.keys(p).length === 3;
                         return (
                             <div key={p.name + "-" + idx}>
                                 <PokemonCard
                                     key={p.name}
-                                    pokemon={
-                                        p.isPartial || isPartial ? p.name : p
-                                    }
+                                    pokemon={p}
                                     isCustomPokemon={p.isCustomPokemon}
+                                    cachedUser={cachedUser}
+                                    setCachedUser={setCachedUser}
                                 />
                             </div>
                         );
