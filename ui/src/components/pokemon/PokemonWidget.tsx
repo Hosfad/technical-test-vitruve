@@ -51,8 +51,8 @@ function PokemonWidget({
                 id="pokemon-widget"
             >
                 <img
-                    src={pokemon.sprites?.front_default}
-                    alt={pokemon.name}
+                    src={currentPokemon.sprites?.front_default}
+                    alt={currentPokemon.name}
                     className={css({ width: 100, height: 100 })}
                 />
                 <h1>{capitalizeFirstLetter(currentPokemon.name!)}</h1>
@@ -105,21 +105,21 @@ function PokemonWidget({
                 Size:
                 <span className={css({ fontSize: "sm" })}>
                     {" "}
-                    0.{pokemon.height}/m, 0.{pokemon.weight}/kg
+                    0.{currentPokemon.height}/m, 0.{currentPokemon.weight}/kg
                 </span>
             </h1>
 
             <h1 className={css({ textAlign: "start" })}>Base stats:</h1>
 
             <div
-                id={`stats-widget-${pokemon.name}`}
+                id={`stats-widget-${currentPokemon.name}`}
                 className={css({
                     display: "flex",
                     flexDirection: "column",
                     gap: 4,
                 })}
             >
-                {pokemon.stats?.map((stat) => (
+                {currentPokemon.stats?.map((stat) => (
                     <StatsProgressBar
                         key={stat.stat.name}
                         stat={stat.stat.name}
@@ -128,7 +128,7 @@ function PokemonWidget({
                 ))}
             </div>
 
-            {pokemon.isCustomPokemon && (
+            {currentPokemon.isCustomPokemon && (
                 <CreateOrEditPokemonWidget
                     pokemon={currentPokemon as Pokemon}
                 ></CreateOrEditPokemonWidget>
