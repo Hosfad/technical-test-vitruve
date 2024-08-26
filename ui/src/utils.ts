@@ -17,17 +17,27 @@ export async function getPokemonDataRaw(
 }
 
 export async function getAllPokemon(
-    page?: number
+    page?: number,
+    cachedUser?: User | null
 ): Promise<{ results: Pokemon[]; next: boolean }> {
     const { results: raw, next } = await getPokemonDataRaw(page);
-    const all = await Promise.all(
+    const all: (Pokemon | null)[] = await Promise.all(
         raw.map(async (p) => {
             const pokemon = await getPokemon(p.name);
             return pokemon;
         })
     );
+    const favorite = page === 1 ? await getFavoritePokemon(cachedUser) : [];
 
-    return { results: all as Pokemon[], next };
+    const resObj: Pokemon[] = [...favorite];
+    all.forEach((p) => {
+        const resObjCOntains = resObj.find((r) => r?.name === p?.name);
+        if (!resObjCOntains) {
+            resObj.push(p as Pokemon);
+        }
+    });
+
+    return { results: resObj.filter((p) => p !== null) as Pokemon[], next };
 }
 
 export async function getPokemon(
@@ -52,6 +62,21 @@ export async function getPokemon(
     return data;
 }
 
+export async function getFavoritePokemon(
+    cachedUser?: User | null
+): Promise<Pokemon[]> {
+    if (!cachedUser) {
+        return [];
+    }
+    const all = Promise.all(
+        cachedUser.favorites.map(async (p) => {
+            const pokemon = await getPokemon(p.name);
+            return pokemon;
+        })
+    );
+    const resObj = (await all).filter((p) => p !== null);
+    return resObj as Pokemon[];
+}
 export function getPokemonType(type: string) {
     return types.find((t) => t.name === type);
 }

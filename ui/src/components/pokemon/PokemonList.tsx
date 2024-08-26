@@ -43,7 +43,8 @@ function PokemonList() {
                 return { results: cachedData, next: true };
             }
 
-            const data = await getAllPokemon(pageParam as number);
+            const data = await getAllPokemon(pageParam as number, cachedUser);
+
             const allData = [...allPokemon, ...data.results];
             setAllPokemon(allData);
             setCurrentPokemon(allData);
